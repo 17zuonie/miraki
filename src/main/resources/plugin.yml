@@ -1,0 +1,6 @@
+name: "Miraki"
+author: "HigherSY"
+version: "0.1.0"
+main: "org.akteam.miraki.Miraki"
+info: "Mirai version of Aki"
+depends: []
