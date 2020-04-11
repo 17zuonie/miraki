@@ -110,17 +110,23 @@ object Miraki : PluginBase() {
             }
         }
         subscribeAlways<MessageRecallEvent.GroupRecall> {
+            var msg: Models.StoredGroupMessage? = null
+            try {
+                msg = database.sequenceOf(Models.StoredGroupMessages)
+                    .filter { it.groupId eq this.group.id }
+                    .filter { it.sourceId eq this.messageId }
+                    .sortedByDescending { it.messageTime }
+                    .first()
+            } catch (e: NoSuchElementException) {
+                logger.info("Message not found in database")
+            }
 
-            val msg = database.sequenceOf(Models.StoredGroupMessages)
-                .filter { it.groupId eq this.group.id }
-                .filter { it.sourceId eq this.messageId }
-                .sortedByDescending { it.messageTime }
-                .first()
-
-            if (msg.revoked) return@subscribeAlways
-            msg.revoked = true
-            if (this.group.id in config.antiRevokeGroups && Random.nextInt(5) == 1) this.group.sendMessage(PlainText("哈哈~ 我看到了\n") + At(this.author) + "：“${msg.text}”")
-            msg.flushChanges()
+            msg?.let {
+                if (it.revoked) return@subscribeAlways
+                it.revoked = true
+                if (this.group.id in config.antiRevokeGroups && Random.nextInt(5) == 1) this.group.sendMessage(PlainText("哈哈~ 我看到了\n") + At(this.author) + "：“${it.text}”")
+                it.flushChanges()
+            }
         }
         logger.warning("Miraki enabled!")
     }
