@@ -73,7 +73,7 @@ class Models {
         val data: FnData
     ) {
         @JsonClass(generateAdapter = true)
-        data class FnData (
+        data class FnData(
             val id: String,
             val content: String,
             val popularity: Int,
