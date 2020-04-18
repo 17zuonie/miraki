@@ -13,14 +13,15 @@ import net.mamoe.mirai.console.command.registerCommand
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.console.plugins.withDefaultWriteSave
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.contact.sendMessage
 import net.mamoe.mirai.event.events.MessageRecallEvent
 import net.mamoe.mirai.event.events.author
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.Face
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.recallIn
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
@@ -44,6 +45,7 @@ object Miraki : PluginBase() {
     private val config = object {
         val fileConfig = loadConfig("settings.yml")
 
+        val rootUser by fileConfig.withDefaultWriteSave { 100000L }
         val databaseUrl by fileConfig.withDefaultWriteSave {
             "${dataFolder.toRelativeString(File("").absoluteFile)}/test.db" // related to current working directory
         }
@@ -130,7 +132,7 @@ object Miraki : PluginBase() {
                             .body!!.string()
                     }
 
-                    subject.sendMessage(text)
+                    quoteReply(text)
                 }
             }
 
@@ -148,7 +150,7 @@ object Miraki : PluginBase() {
                         moshi.adapter(Models.Poem::class.java).fromJson(raw)!!
                     }
 
-                    subject.sendMessage(poem.data.content)
+                    quoteReply(poem.data.content)
                 }
             }
 
@@ -173,11 +175,21 @@ object Miraki : PluginBase() {
                     }
 
                 }
-                reply(builder.asMessageChain())
+                quoteReply(builder.asMessageChain())
+                    .recallIn(20000)
             }
         }
 
         subscribeAlways<MessageRecallEvent.GroupRecall> {
+            if (operator == null) return@subscribeAlways
+            if (authorId == bot.id && operator!!.id != config.rootUser) {
+                if (Random.nextInt(2) == 1)
+                    this.group.sendMessage(
+                        PlainText("居然撤我消息") + Face(106) + PlainText("\n哼唧~ ╭(╯^╰)╮")
+                    )
+                return@subscribeAlways
+            }
+
             var msg: Models.StoredGroupMessage? = null
             try {
                 msg = database.sequenceOf(Models.StoredGroupMessages)
@@ -192,11 +204,11 @@ object Miraki : PluginBase() {
             msg?.let {
                 if (it.revoked) return@subscribeAlways
                 it.revoked = true
-                if (this.group.id in config.antiRevokeGroups && Random.nextInt(5) == 1) this.group.sendMessage(
-                    PlainText(
-                        "哈哈~ 我看到了\n"
-                    ) + At(this.author) + "：“${it.text}”"
-                )
+                if (this.group.id in config.antiRevokeGroups && Random.nextInt(5) == 1) {
+                    this.group.sendMessage(
+                        PlainText("哈哈~ 我看到了\n") + At(this.author) + "：“${it.text}”"
+                    ).recallIn(20000)
+                }
                 it.flushChanges()
             }
         }
