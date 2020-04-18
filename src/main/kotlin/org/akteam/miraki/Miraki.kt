@@ -1,9 +1,7 @@
 package org.akteam.miraki
 
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.*
@@ -13,6 +11,7 @@ import net.mamoe.mirai.console.command.registerCommand
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.console.plugins.withDefaultWriteSave
 import net.mamoe.mirai.contact.nameCardOrNick
+import net.mamoe.mirai.contact.sendMessage
 import net.mamoe.mirai.event.events.MessageRecallEvent
 import net.mamoe.mirai.event.events.author
 import net.mamoe.mirai.event.subscribeAlways
@@ -29,7 +28,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 object Miraki : PluginBase() {
-    private lateinit var database: Database
+    lateinit var database: Database
 
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(5, TimeUnit.SECONDS)
@@ -45,11 +44,14 @@ object Miraki : PluginBase() {
     private val config = object {
         val fileConfig = loadConfig("settings.yml")
 
+        val akiQQ by fileConfig.withDefaultWriteSave { 100000L }
         val rootUser by fileConfig.withDefaultWriteSave { 100000L }
         val databaseUrl by fileConfig.withDefaultWriteSave {
             "${dataFolder.toRelativeString(File("").absoluteFile)}/test.db" // related to current working directory
         }
         val jinrishiciToken by fileConfig.withDefaultWriteSave { "jLiBz0S2lSVPODeBTwnKT5B5Cxz8t5G6" } // it is persistent no need to change
+        val fetchNoticeDelay by fileConfig.withDefaultWriteSave { 60 * 1000L }
+
         val antiRevokeGroups by lazy {
             fileConfig.setIfAbsent("antiRevokeGroups", listOf<Long>(187410654))
             fileConfig.getLongList("antiRevokeGroups").toMutableList()
@@ -58,11 +60,47 @@ object Miraki : PluginBase() {
             fileConfig.setIfAbsent("longwangLookupGroups", listOf<Long>(187410654))
             fileConfig.getLongList("longwangLookupGroups")
         }
+        val noticeBroadcastGroups by lazy {
+            fileConfig.setIfAbsent("noticeBroadcastGroups", listOf<Long>(187410654))
+            fileConfig.getLongList("noticeBroadcastGroups")
+        }
 
         fun manualSave() {
             fileConfig["antiRevokeGroups"] = antiRevokeGroups
             fileConfig["longwangLookupGroups"] = longwangLookupGroups
+            fileConfig["noticeBroadcastGroups"] = noticeBroadcastGroups
             fileConfig.save()
+        }
+    }
+
+    lateinit var latestNoticeTitle: String
+    lateinit var fetchNoticeLoop: Job
+
+    fun startFetchNoticeLoop() {
+        database.sequenceOf(Models.Notices).lastOrNull().let {
+            latestNoticeTitle = it?.titleWithAuthor ?: ""
+        }
+        fetchNoticeLoop = launch {
+            while (true) {
+                delay(config.fetchNoticeDelay)
+                logger.info("Triggered fetchNotice")
+                val notice = ChunHuiNotice.fetchNotice()
+                if (notice.titleWithAuthor != latestNoticeTitle) {
+                    latestNoticeTitle = notice.titleWithAuthor
+                    val seq = database.sequenceOf(Models.Notices)
+                    seq.add(notice)
+                    val bot = Bot.getInstance(config.akiQQ)
+                    bot.getFriend(config.rootUser).sendMessage(notice.toString())
+
+                    val msg =
+                        PlainText("校园公告@春晖：\n${notice.titleWithAuthor}\n\t${notice.date} | ${notice.relativeDate}")
+                    for (gid in config.noticeBroadcastGroups) {
+                        bot.getGroup(gid).sendMessage(msg)
+                    }
+                } else {
+                    logger.info("No new notice found")
+                }
+            }
         }
     }
 
@@ -77,11 +115,12 @@ object Miraki : PluginBase() {
             description = "管理 Aki 的运行"
             usage = """
                 /aki dumpGroup <botQQ> <targetGroupId>
-                /aki dumpArticle
+                /aki dumpNotice
+                /aki startLoop
+                /aki clearNotices
             """.trimIndent()
             onCommand {
                 if (it.isEmpty()) return@onCommand false
-                logger.info(it[0].toLowerCase())
                 when (it[0].toLowerCase()) {
                     "dumpgroup" -> {
                         val builder = MessageChainBuilder()
@@ -93,11 +132,22 @@ object Miraki : PluginBase() {
                             }
                         sendMessage(builder.asMessageChain())
                     }
-                    "dumparticle" -> {
-                        val article = withContext(Dispatchers.IO) {
-                            ChunHuiNotice.fetchNotice()
+                    "dumpnotice" -> {
+                        val notice = ChunHuiNotice.fetchNotice()
+                        sendMessage(notice.toString())
+                    }
+                    "startloop" -> {
+                        if (!fetchNoticeLoop.isActive) {
+                            startFetchNoticeLoop()
+                            sendMessage("Started.")
+                        } else {
+                            sendMessage("The loop is already running!")
                         }
-                        sendMessage(article.toString())
+                    }
+                    "clearnotices" -> {
+                        database.deleteAll(Models.Notices)
+                        latestNoticeTitle = ""
+                        sendMessage("Done.")
                     }
                     else -> {
                         return@onCommand false
@@ -212,6 +262,8 @@ object Miraki : PluginBase() {
                 it.flushChanges()
             }
         }
+
+        startFetchNoticeLoop()
 
         logger.warning("Miraki enabled!")
     }

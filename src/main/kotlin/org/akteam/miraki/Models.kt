@@ -69,4 +69,20 @@ class Models {
             val cacheAt: String
         )
     }
+
+    interface Notice : Entity<Notice> {
+        companion object : Entity.Factory<Notice>()
+
+        val n: Int
+        var relativeDate: String
+        var date: String
+        var titleWithAuthor: String
+    }
+
+    object Notices : Table<Notice>("aki_notice") {
+        val n by int("n").primaryKey().bindTo { it.n }
+        val relativeDate by varchar("relative_date").bindTo { it.relativeDate }
+        val date by varchar("date").bindTo { it.date }
+        val titleWithAuthor by varchar("title_with_author").bindTo { it.titleWithAuthor }
+    }
 }
