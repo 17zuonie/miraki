@@ -5,10 +5,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.liuwj.ktorm.database.Database
-import me.liuwj.ktorm.database.SqlDialect
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.*
 import me.liuwj.ktorm.support.sqlite.SQLiteDialect
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.command.registerCommand
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.console.plugins.withDefaultWriteSave
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -69,6 +70,41 @@ object Miraki : PluginBase() {
     }
 
     override fun onEnable() {
+        registerCommand {
+            name = "aki"
+            description = "管理 Aki 的运行"
+            usage = """
+                /aki dumpGroup <botQQ> <targetGroupId>
+                /aki dumpArticle
+            """.trimIndent()
+            onCommand {
+                if (it.isEmpty()) return@onCommand false
+                logger.info(it[0].toLowerCase())
+                when (it[0].toLowerCase()) {
+                    "dumpgroup" -> {
+                        val builder = MessageChainBuilder()
+                        Bot.getInstance(it[1].toLong())
+                            .getGroup(it[2].toLong())
+                            .members
+                            .forEach { m ->
+                                builder.add("${m.id} ${m.nameCardOrNick}\n")
+                            }
+                        sendMessage(builder.asMessageChain())
+                    }
+                    "dumparticle" -> {
+                        val article = withContext(Dispatchers.IO) {
+                            ChunHuiNotice.fetchNotice()
+                        }
+                        sendMessage(article.toString())
+                    }
+                    else -> {
+                        return@onCommand false
+                    }
+                }
+                return@onCommand true
+            }
+        }
+
         subscribeGroupMessages {
             always {
                 val msg = Models.StoredGroupMessage {
@@ -77,6 +113,7 @@ object Miraki : PluginBase() {
                     groupId = group.id
                     senderId = sender.id
                     text = message.contentToString()
+                    rawMessage = message.toString()
                     revoked = false
                 }
                 database.sequenceOf(Models.StoredGroupMessages).add(msg)
@@ -129,7 +166,12 @@ object Miraki : PluginBase() {
                 val builder = MessageChainBuilder()
                 builder.add("我们群拥有来自五湖四海的龙王：\n")
                 all.forEachIndexed { i, row ->
-                    builder.add("No.${i}: ${group.members[row[t.senderId]!!].nameCardOrNick}: ${row[cnt]}\n")
+                    try {
+                        builder.add("No.${i}: ${group.members[row[t.senderId]!!].nameCardOrNick}: ${row[cnt]}\n")
+                    } catch (e: NoSuchElementException) {
+                        builder.add("No.${i}: 他挥了挥衣袖,不带走一片云彩: ${row[cnt]}\n")
+                    }
+
                 }
                 reply(builder.asMessageChain())
             }
