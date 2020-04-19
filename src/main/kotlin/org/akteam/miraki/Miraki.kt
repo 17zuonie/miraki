@@ -234,7 +234,7 @@ object Miraki : PluginBase() {
 
         subscribeAlways<MessageRecallEvent.GroupRecall> {
             if (operator == null) return@subscribeAlways
-            if (authorId == bot.id && operator!!.id != config.rootUser) {
+            if (authorId == bot.id && operator!!.id != config.rootUser && this.group.id in config.antiRevokeGroups) {
                 if (Random.nextInt(2) == 1)
                     this.group.sendMessage(
                         PlainText("居然撤我消息") + Face(106) + PlainText("\n哼唧~ ╭(╯^╰)╮")
