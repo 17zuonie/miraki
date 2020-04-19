@@ -7,7 +7,6 @@ import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.*
 import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.command.registerCommand
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.console.plugins.withDefaultWriteSave
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -41,7 +40,7 @@ object Miraki : PluginBase() {
 //        .add(KotlinJsonAdapterFactory())
         .build()!!
 
-    private val config = object {
+    object Config {
         val fileConfig = loadConfig("settings.yml")
 
         val akiQQ by fileConfig.withDefaultWriteSave { 100000L }
@@ -74,19 +73,19 @@ object Miraki : PluginBase() {
         }
         fetchNoticeLoop = launch {
             while (true) {
-                delay(config.fetchNoticeDelay)
+                delay(Config.fetchNoticeDelay)
                 logger.info("Triggered fetchNotice")
                 val notice = ChunHuiNotice.fetchNotice()
                 if (notice.titleWithAuthor != latestNoticeTitle) {
                     latestNoticeTitle = notice.titleWithAuthor
                     val seq = database.sequenceOf(Models.Notices)
                     seq.add(notice)
-                    val bot = Bot.getInstance(config.akiQQ)
-                    bot.getFriend(config.rootUser).sendMessage(notice.toString())
+                    val bot = Bot.getInstance(Config.akiQQ)
+                    bot.getFriend(Config.rootUser).sendMessage(notice.toString())
 
                     val msg =
                         PlainText("校园公告@春晖：\n${notice.titleWithAuthor}\n\t${notice.date} | ${notice.relativeDate}")
-                    for (gid in config.noticeBroadcastGroups) {
+                    for (gid in Config.noticeBroadcastGroups) {
                         bot.getGroup(gid).sendMessage(msg)
                     }
                 } else {
@@ -100,65 +99,15 @@ object Miraki : PluginBase() {
 //        database = Database.connect("jdbc:h2:miraki_db", "org.h2.Driver")
 //        database = Database.connect("jdbc:sqlite:${config.databaseUrl}", "org.sqlite.JDBC", dialect = SQLiteDialect())
         database = Database.connect(
-            config.databaseUrl,
+            Config.databaseUrl,
             "org.postgresql.Driver",
-            config.databaseUser,
+            Config.databaseUser,
             dialect = PostgreSqlDialect()
         )
     }
 
     override fun onEnable() {
-        registerCommand {
-            name = "aki"
-            description = "管理 Aki 的运行"
-            usage = """
-                /aki save
-                /aki dumpGroup <botQQ> <targetGroupId>
-                /aki dumpNotice
-                /aki startLoop
-                /aki clearNotices
-            """.trimIndent()
-            onCommand {
-                if (it.isEmpty()) return@onCommand false
-                when (it[0].toLowerCase()) {
-                    "save" -> {
-                        config.fileConfig.save()
-                        sendMessage("Done.")
-                    }
-                    "dumpgroup" -> {
-                        val builder = MessageChainBuilder()
-                        Bot.getInstance(it[1].toLong())
-                            .getGroup(it[2].toLong())
-                            .members
-                            .forEach { m ->
-                                builder.add("${m.id} ${m.nameCardOrNick}\n")
-                            }
-                        sendMessage(builder.asMessageChain())
-                    }
-                    "dumpnotice" -> {
-                        val notice = ChunHuiNotice.fetchNotice()
-                        sendMessage(notice.toString())
-                    }
-                    "startloop" -> {
-                        if (!fetchNoticeLoop.isActive) {
-                            startFetchNoticeLoop()
-                            sendMessage("Started.")
-                        } else {
-                            sendMessage("The loop is already running!")
-                        }
-                    }
-                    "clearnotices" -> {
-                        database.deleteAll(Models.Notices)
-                        latestNoticeTitle = ""
-                        sendMessage("Done.")
-                    }
-                    else -> {
-                        return@onCommand false
-                    }
-                }
-                return@onCommand true
-            }
-        }
+        Commands.register()
 
         subscribeGroupMessages {
             always {
@@ -192,7 +141,7 @@ object Miraki : PluginBase() {
                 launch {
                     val req = Request.Builder()
                         .url("https://v2.jinrishici.com/sentence")
-                        .header("X-User-Token", config.jinrishiciToken)
+                        .header("X-User-Token", Config.jinrishiciToken)
                         .build()
 
                     val poem = withContext(Dispatchers.IO) {
@@ -207,7 +156,7 @@ object Miraki : PluginBase() {
             }
 
             contains("龙王") {
-                if (group.id !in config.longwangLookupGroups) return@contains
+                if (group.id !in Config.longwangLookupGroups) return@contains
                 val t = Models.StoredGroupMessages
                 val cnt = count(t.n).aliased("cnt")
                 val all = database.from(t)
@@ -234,7 +183,7 @@ object Miraki : PluginBase() {
 
         subscribeAlways<MessageRecallEvent.GroupRecall> {
             if (operator == null) return@subscribeAlways
-            if (authorId == bot.id && operator!!.id != config.rootUser && this.group.id in config.antiRevokeGroups) {
+            if (authorId == bot.id && operator!!.id != Config.rootUser && this.group.id in Config.antiRevokeGroups) {
                 if (Random.nextInt(2) == 1)
                     this.group.sendMessage(
                         PlainText("居然撤我消息") + Face(106) + PlainText("\n哼唧~ ╭(╯^╰)╮")
@@ -256,7 +205,7 @@ object Miraki : PluginBase() {
             msg?.let {
                 if (it.revoked) return@subscribeAlways
                 it.revoked = true
-                if (this.group.id in config.antiRevokeGroups && Random.nextInt(5) == 1) {
+                if (this.group.id in Config.antiRevokeGroups && Random.nextInt(5) == 1) {
                     this.group.sendMessage(
                         PlainText("哈哈~ 我看到了\n") + At(this.author) + "：“${it.text}”"
                     ).recallIn(20000)
