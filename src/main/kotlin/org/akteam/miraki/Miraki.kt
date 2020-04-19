@@ -54,7 +54,7 @@ object Miraki : PluginBase() {
 
         val antiRevokeGroups by lazy {
             fileConfig.setIfAbsent("antiRevokeGroups", listOf<Long>(187410654))
-            fileConfig.getLongList("antiRevokeGroups").toMutableList()
+            fileConfig.getLongList("antiRevokeGroups")
         }
         val longwangLookupGroups by lazy {
             fileConfig.setIfAbsent("longwangLookupGroups", listOf<Long>(187410654))
@@ -63,13 +63,6 @@ object Miraki : PluginBase() {
         val noticeBroadcastGroups by lazy {
             fileConfig.setIfAbsent("noticeBroadcastGroups", listOf<Long>(187410654))
             fileConfig.getLongList("noticeBroadcastGroups")
-        }
-
-        fun manualSave() {
-            fileConfig["antiRevokeGroups"] = antiRevokeGroups
-            fileConfig["longwangLookupGroups"] = longwangLookupGroups
-            fileConfig["noticeBroadcastGroups"] = noticeBroadcastGroups
-            fileConfig.save()
         }
     }
 
@@ -114,6 +107,7 @@ object Miraki : PluginBase() {
             name = "aki"
             description = "管理 Aki 的运行"
             usage = """
+                /aki save
                 /aki dumpGroup <botQQ> <targetGroupId>
                 /aki dumpNotice
                 /aki startLoop
@@ -122,6 +116,10 @@ object Miraki : PluginBase() {
             onCommand {
                 if (it.isEmpty()) return@onCommand false
                 when (it[0].toLowerCase()) {
+                    "save" -> {
+                        config.fileConfig.save()
+                        sendMessage("Done.")
+                    }
                     "dumpgroup" -> {
                         val builder = MessageChainBuilder()
                         Bot.getInstance(it[1].toLong())
@@ -269,7 +267,6 @@ object Miraki : PluginBase() {
     }
 
     override fun onDisable() {
-        config.manualSave()
         logger.warning("Miraki disabled!")
     }
 }
