@@ -5,7 +5,7 @@ import kotlinx.coroutines.*
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.*
-import me.liuwj.ktorm.support.sqlite.SQLiteDialect
+import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.command.registerCommand
 import net.mamoe.mirai.console.plugins.PluginBase
@@ -23,7 +23,7 @@ import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.recallIn
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.File
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
@@ -46,9 +46,8 @@ object Miraki : PluginBase() {
 
         val akiQQ by fileConfig.withDefaultWriteSave { 100000L }
         val rootUser by fileConfig.withDefaultWriteSave { 100000L }
-        val databaseUrl by fileConfig.withDefaultWriteSave {
-            "${dataFolder.toRelativeString(File("").absoluteFile)}/test.db" // related to current working directory
-        }
+        val databaseUrl by fileConfig.withDefaultWriteSave { "jdbc:postgresql:miraki" }
+        val databaseUser by fileConfig.withDefaultWriteSave { "miraki" }
         val jinrishiciToken by fileConfig.withDefaultWriteSave { "jLiBz0S2lSVPODeBTwnKT5B5Cxz8t5G6" } // it is persistent no need to change
         val fetchNoticeDelay by fileConfig.withDefaultWriteSave { 60 * 1000L }
 
@@ -99,7 +98,13 @@ object Miraki : PluginBase() {
 
     override fun onLoad() {
 //        database = Database.connect("jdbc:h2:miraki_db", "org.h2.Driver")
-        database = Database.connect("jdbc:sqlite:${config.databaseUrl}", "org.sqlite.JDBC", dialect = SQLiteDialect())
+//        database = Database.connect("jdbc:sqlite:${config.databaseUrl}", "org.sqlite.JDBC", dialect = SQLiteDialect())
+        database = Database.connect(
+            config.databaseUrl,
+            "org.postgresql.Driver",
+            config.databaseUser,
+            dialect = PostgreSqlDialect()
+        )
     }
 
     override fun onEnable() {
@@ -159,11 +164,10 @@ object Miraki : PluginBase() {
             always {
                 val msg = Models.StoredGroupMessage {
                     sourceId = source.id
-                    messageTime = source.time
+                    messageTime = Instant.ofEpochSecond(source.time.toLong())
                     groupId = group.id
                     senderId = sender.id
                     text = message.contentToString()
-                    rawMessage = message.toString()
                     revoked = false
                 }
                 database.sequenceOf(Models.StoredGroupMessages).add(msg)

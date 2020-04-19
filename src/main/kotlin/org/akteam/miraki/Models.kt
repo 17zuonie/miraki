@@ -3,6 +3,7 @@ package org.akteam.miraki
 import com.squareup.moshi.JsonClass
 import me.liuwj.ktorm.entity.Entity
 import me.liuwj.ktorm.schema.*
+import java.time.Instant
 
 class Models {
     interface StoredGroupMessage : Entity<StoredGroupMessage> {
@@ -10,22 +11,20 @@ class Models {
 
         val n: Int
         var sourceId: Int
-        var messageTime: Int
+        var messageTime: Instant
         var groupId: Long
         var senderId: Long
         var text: String
-        var rawMessage: String
         var revoked: Boolean
     }
 
     object StoredGroupMessages : Table<StoredGroupMessage>("aki_stored_message") {
         val n by int("n").primaryKey().bindTo { it.n }
         val sourceId by int("source_id").bindTo { it.sourceId }
-        val messageTime by int("message_time").bindTo { it.messageTime }
+        val messageTime by timestamp("message_time").bindTo { it.messageTime }
         val groupId by long("group_id").bindTo { it.groupId }
         val senderId by long("sender_id").bindTo { it.senderId }
         val text by varchar("text").bindTo { it.text }
-        val rawMessage by varchar("raw_message").bindTo { it.rawMessage }
         val revoked by boolean("revoked").bindTo { it.revoked }
     }
 
