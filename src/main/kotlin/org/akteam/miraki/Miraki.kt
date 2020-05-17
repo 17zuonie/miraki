@@ -10,7 +10,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.console.plugins.withDefaultWriteSave
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.contact.sendMessage
+import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.events.MessageRecallEvent
 import net.mamoe.mirai.event.events.author
 import net.mamoe.mirai.event.subscribeAlways
@@ -73,25 +73,31 @@ object Miraki : PluginBase() {
         }
         fetchNoticeLoop = launch {
             while (true) {
-                delay(Config.fetchNoticeDelay)
-                logger.info("Triggered fetchNotice")
-                val notice = ChunHuiNotice.fetchNotice()
-                if (notice.titleWithAuthor != latestNoticeTitle) {
-                    latestNoticeTitle = notice.titleWithAuthor
-                    val seq = database.sequenceOf(Models.Notices)
-                    seq.add(notice)
-                    val bot = Bot.getInstance(Config.akiQQ)
-                    bot.getFriend(Config.rootUser).sendMessage(notice.toString())
+                try {
+                    delay(Config.fetchNoticeDelay)
+                    logger.info("Triggered fetchNotice")
+                    val notice = ChunHuiNotice.fetchNotice()
+                    if (notice.titleWithAuthor != latestNoticeTitle) {
+                        latestNoticeTitle = notice.titleWithAuthor
+                        val seq = database.sequenceOf(Models.Notices)
+                        seq.add(notice)
+                        val bot = Bot.getInstance(Config.akiQQ)
+                        bot.getFriend(Config.rootUser).sendMessage(notice.toString())
 
-                    val msg =
-                        PlainText("校园公告@春晖：\n${notice.titleWithAuthor}\n\t${notice.date} | ${notice.relativeDate}")
-                    for (gid in Config.noticeBroadcastGroups) {
-                        bot.getGroup(gid).sendMessage(msg)
+                        val msg =
+                            PlainText("校园公告@春晖：\n${notice.titleWithAuthor}\n\t${notice.date} | ${notice.relativeDate}")
+                        for (gid in Config.noticeBroadcastGroups) {
+                            bot.getGroup(gid).sendMessage(msg)
+                        }
+                    } else {
+                        logger.info("No new notice found")
                     }
-                } else {
-                    logger.info("No new notice found")
+                } catch (e: Exception) {
+                    val bot = Bot.getInstance(Config.akiQQ)
+                    bot.getFriend(Config.rootUser).sendMessage(e.toString())
                 }
             }
+
         }
     }
 
@@ -108,7 +114,6 @@ object Miraki : PluginBase() {
 
     override fun onEnable() {
         Commands.register()
-
         subscribeGroupMessages {
             always {
                 val msg = Models.StoredGroupMessage {
@@ -121,7 +126,9 @@ object Miraki : PluginBase() {
                 }
                 database.sequenceOf(Models.StoredGroupMessages).add(msg)
             }
+        }
 
+        subscribeGroupMessages(priority = Listener.EventPriority.LOW) {
             contains("一言") {
                 launch {
                     val req = Request.Builder()
@@ -213,8 +220,6 @@ object Miraki : PluginBase() {
                 it.flushChanges()
             }
         }
-
-        startFetchNoticeLoop()
 
         logger.warning("Miraki enabled!")
     }

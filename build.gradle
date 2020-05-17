@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'org.akteam'
-version '2.0-SNAPSHOT'
+version '2.2-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -19,8 +19,8 @@ repositories {
 
 dependencies {
     compileOnly 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    compileOnly 'net.mamoe:mirai-core:0.37.4'
-    compileOnly 'net.mamoe:mirai-console:0.4.9'
+    compileOnly 'net.mamoe:mirai-core:1.0-RC2-1'
+    compileOnly 'net.mamoe:mirai-console:0.5.1'
 
     implementation "me.liuwj.ktorm:ktorm-core:2.7.2"
     implementation "me.liuwj.ktorm:ktorm-support-postgresql:2.7.2"
