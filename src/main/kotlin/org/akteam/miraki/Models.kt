@@ -1,11 +1,11 @@
 package org.akteam.miraki
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 import me.liuwj.ktorm.entity.Entity
 import me.liuwj.ktorm.schema.*
 import java.time.Instant
 
-class Models {
+object Models {
     interface StoredGroupMessage : Entity<StoredGroupMessage> {
         companion object : Entity.Factory<StoredGroupMessage>()
 
@@ -40,33 +40,22 @@ class Models {
         val name by varchar("name").bindTo { it.name }
     }
 
+    enum class UserRole {
+        ROOT, ADMIN, TESTER, STUDENT, TEACHER, NORMAL
+    }
+
     interface User : Entity<User> {
         companion object : Entity.Factory<User>()
 
         var id: Long
         var trueName: String
+        var role: UserRole
     }
 
     object Users : Table<User>("aki_user") {
         val id by long("id").primaryKey().bindTo { it.id }
         val trueName by varchar("true_name").bindTo { it.trueName }
-    }
-
-    @JsonClass(generateAdapter = true)
-    data class Poem(
-        val status: String,
-        val data: FnData
-    ) {
-        @JsonClass(generateAdapter = true)
-        data class FnData(
-            val id: String,
-            val content: String,
-            val popularity: Int,
-            val origin: Map<String, Any>,
-            val matchTags: List<String>,
-            val recommendedReason: String,
-            val cacheAt: String
-        )
+        val role by enum("role", typeRef<UserRole>()).bindTo { it.role }
     }
 
     interface Notice : Entity<Notice> {
@@ -83,5 +72,24 @@ class Models {
         val relativeDate by varchar("relative_date").bindTo { it.relativeDate }
         val date by varchar("date").bindTo { it.date }
         val titleWithAuthor by varchar("title_with_author").bindTo { it.titleWithAuthor }
+    }
+}
+
+object JsonModels {
+    @Serializable
+    data class Poem(
+        val status: String,
+        val data: FnData
+    ) {
+        @Serializable
+        data class FnData(
+            val id: String,
+            val content: String,
+            val popularity: Int,
+//            val origin: Map<String, Any>,
+            val matchTags: List<String>,
+            val recommendedReason: String,
+            val cacheAt: String
+        )
     }
 }

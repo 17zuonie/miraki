@@ -1,7 +1,8 @@
 package org.akteam.miraki
 
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.*
@@ -36,9 +37,7 @@ object Miraki : PluginBase() {
         .callTimeout(10, TimeUnit.SECONDS)
         .build()
 
-    private val moshi = Moshi.Builder()
-//        .add(KotlinJsonAdapterFactory())
-        .build()!!
+    private val json = Json(JsonConfiguration.Stable)
 
     object Config {
         val fileConfig = loadConfig("settings.yml")
@@ -154,8 +153,7 @@ object Miraki : PluginBase() {
                     val poem = withContext(Dispatchers.IO) {
                         val raw = httpClient.newCall(req).execute()
                             .body!!.string()
-
-                        moshi.adapter(Models.Poem::class.java).fromJson(raw)!!
+                        json.parse(JsonModels.Poem.serializer(), raw)
                     }
 
                     quoteReply(poem.data.content)
