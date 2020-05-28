@@ -2,6 +2,7 @@ package org.akteam.miraki.commands
 
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
+import org.akteam.miraki.objects.BotUser
 
 /**
  * 通用命令接口
@@ -11,7 +12,7 @@ import net.mamoe.mirai.message.data.MessageChain
  */
 interface UniversalCommand {
     /** 执行命令后的逻辑 */
-    suspend fun execute(event: MessageEvent, args: List<String>/*, user: BotUser*/): MessageChain
+    suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain
 
     /** 命令属性 */
     fun getProps(): CommandProps

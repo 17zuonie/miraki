@@ -1,9 +1,11 @@
 package org.akteam.miraki.commands
 
+import me.liuwj.ktorm.entity.asSequence
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
+import org.akteam.miraki.objects.BotUsers
 import java.util.*
 
 /**
@@ -55,7 +57,7 @@ object CommandExecutor {
 
 //                return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
                 val splitMessage = event.message.contentToString().split(" ")
-                return doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size)/*, user*/))
+                return doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
 //                } else {
 //                    BotUtil.sendMsgPrefix("你没有权限!").toMirai()
 //                }

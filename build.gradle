@@ -11,10 +11,7 @@ version '2.2-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
-    maven { url 'https://mirrors.huaweicloud.com/repository/maven' }
-    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
-    mavenCentral()
-    jcenter()
+    maven { url 'https://maven.aliyun.com/repository/public' }
 }
 
 dependencies {
