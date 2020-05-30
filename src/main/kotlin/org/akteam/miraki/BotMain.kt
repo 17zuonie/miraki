@@ -1,5 +1,7 @@
 package org.akteam.miraki
 
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.event.subscribeMessages
@@ -9,6 +11,7 @@ import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
 import org.akteam.miraki.commands.CommandExecutor
 import org.akteam.miraki.commands.HelpCommand
+import org.akteam.miraki.commands.MusicCommand
 import org.akteam.miraki.commands.VersionCommand
 import kotlin.system.exitProcess
 
@@ -23,12 +26,12 @@ object BotMain {
     suspend fun login() {
         val config = BotConfiguration.Default
         config.fileBasedDeviceInfo()
-        bot = Bot(qq = BotMain.qq, password = BotMain.password, configuration = config)
+        bot = Bot(qq = qq, password = password, configuration = config)
         bot.alsoLogin()
     }
 }
 
-suspend fun main() {
+fun main() = runBlocking<Unit> {
     BotMain.startTime = System.currentTimeMillis()
     BotConsts.init()
     BotConsts.load()
@@ -45,20 +48,24 @@ suspend fun main() {
     CommandExecutor.setupCommand(
         arrayOf(
             VersionCommand(),
-            HelpCommand()
+            HelpCommand(),
+            MusicCommand()
+//            UploadCommand()
         )
     )
 
     BotMain.bot.subscribeMessages {
         always {
             if (sender.id != 80000000L) {
-                val result = CommandExecutor.execute(this)
-                if (result !is EmptyMessageChain) {
-                    reply(result)
+                launch {
+                    val result = CommandExecutor.execute(this@always)
+                    if (result !is EmptyMessageChain) reply(result)
                 }
             }
         }
     }
+
+    BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
 
     BotMain.bot.join() // 等待 Bot 离线, 避免主线程退出
     TODO("Retry login.")

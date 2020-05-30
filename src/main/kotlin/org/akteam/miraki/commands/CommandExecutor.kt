@@ -1,11 +1,9 @@
 package org.akteam.miraki.commands
 
-import me.liuwj.ktorm.entity.asSequence
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.*
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
-import org.akteam.miraki.objects.BotUsers
 import java.util.*
 
 /**
@@ -46,22 +44,22 @@ object CommandExecutor {
      * @param event 消息
      */
     suspend fun execute(event: MessageEvent): MessageChain {
-        if (isCommandPrefix(event.message.content) /*&& !SessionManager.isValidSession(event.sender.id)*/) {
-            val cmd = getCommand(getCommandName(event.message.contentToString()))
-            if (cmd != null) {
-                BotMain.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.getProps().name)
-//                var user = BotUser.getUser(event.sender.id)
-//                if (user == null) {
-//                    user = BotUser.quickRegister(event.sender.id)
-//                }
-
+        try {
+            if (isCommandPrefix(event.message.content) /*&& !SessionManager.isValidSession(event.sender.id)*/) {
+                val cmd = getCommand(getCommandName(event.message.contentToString()))
+                if (cmd != null) {
+                    BotMain.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.getProps().name)
 //                return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                val splitMessage = event.message.contentToString().split(" ")
-                return doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size), user))
+                    val splitMessage = event.message.contentToString().split(" ")
+                    return doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size)))
 //                } else {
 //                    BotUtil.sendMsgPrefix("你没有权限!").toMirai()
 //                }
+                }
             }
+        } catch (e: Exception) {
+            BotMain.logger.error("[命令] 出现了不可描述的错误")
+            BotMain.logger.error(e)
         }
         return EmptyMessageChain
     }

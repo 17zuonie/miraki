@@ -2,11 +2,10 @@ package org.akteam.miraki.commands
 
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import org.akteam.miraki.objects.BotUser
 import org.akteam.miraki.utils.toMirai
 
 class HelpCommand : UniversalCommand {
-    override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
+    override suspend fun execute(event: MessageEvent, args: List<String>): MessageChain {
         val sb = StringBuilder()
         for (cmd in CommandExecutor.commands) {
             if (cmd.getProps().name.contentEquals("help") || !cmd.getProps().name.contentEquals("debug")) {

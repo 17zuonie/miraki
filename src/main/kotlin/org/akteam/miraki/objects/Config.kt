@@ -8,6 +8,8 @@ data class Config(
     val password: String,
     val rootUser: Long
 ) {
+    val netEaseCookie = ""
+    val netEaseApi = "localhost:3000"
     val databaseUrl = "jdbc:postgresql:miraki"
     val databaseUser = "miraki"
     val jinrishiciToken = "jLiBz0S2lSVPODeBTwnKT5B5Cxz8t5G6" // it is persistent no need to change

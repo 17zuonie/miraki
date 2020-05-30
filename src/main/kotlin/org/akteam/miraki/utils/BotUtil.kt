@@ -1,8 +1,13 @@
 package org.akteam.miraki.utils
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
 import java.util.*
@@ -102,4 +107,33 @@ object BotUtil {
 
         return day.toString() + "天" + hour + "时" + minute + "分" + second + "秒" + ms + "毫秒"
     }
+
+    fun List<String>.getRestString(startAt: Int): String {
+        val sb = StringBuilder()
+        if (this.size == 1) {
+            return this[0]
+        }
+
+        for (index in startAt until this.size) {
+            sb.append(this[index]).append(" ")
+        }
+        return sb.toString().trim()
+    }
+
+    suspend fun OkHttpClient.get(url: String): Response {
+        val req = Request.Builder()
+            .url(url)
+            .build()
+        return withContext(Dispatchers.IO) {
+            newCall(req).execute()
+        }
+    }
+
+    suspend fun OkHttpClient.get(req: Request): Response {
+        return withContext(Dispatchers.IO) {
+            newCall(req).execute()
+        }
+    }
+
+    suspend fun Response.readText() = withContext(Dispatchers.IO) { body!!.string() }
 }
