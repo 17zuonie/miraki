@@ -1,8 +1,10 @@
 package org.akteam.miraki
 
+import com.impossibl.postgres.jdbc.PGDataSource
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import me.liuwj.ktorm.database.Database
+import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
 import org.akteam.miraki.objects.Config
 import java.io.File
 import java.io.FileReader
@@ -32,5 +34,9 @@ object BotConsts {
 
     fun load() {
         cfg = json.parse(Config.serializer(), FileReader(cfgFile).readText())
+        val ds = PGDataSource()
+        ds.databaseUrl = cfg.databaseUrl
+        ds.user = cfg.databaseUser
+        db = Database.connect(ds, dialect = PostgreSqlDialect())
     }
 }

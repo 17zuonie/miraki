@@ -4,6 +4,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
+import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
 import net.mamoe.mirai.message.data.EmptyMessageChain
@@ -13,6 +14,8 @@ import org.akteam.miraki.commands.CommandExecutor
 import org.akteam.miraki.commands.HelpCommand
 import org.akteam.miraki.commands.MusicCommand
 import org.akteam.miraki.commands.VersionCommand
+import org.akteam.miraki.listeners.FuckLightAppListener
+import org.akteam.miraki.listeners.MListener
 import kotlin.system.exitProcess
 
 object BotMain {
@@ -54,7 +57,17 @@ fun main() = runBlocking<Unit> {
         )
     )
 
-    BotMain.bot.subscribeMessages {
+    val listeners: Array<MListener> = arrayOf(
+        FuckLightAppListener
+    )
+
+    /** 监听器 */
+    listeners.forEach {
+        it.register(BotMain.bot)
+        BotMain.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+    }
+
+    BotMain.bot.subscribeMessages(priority = Listener.EventPriority.NORMAL) {
         always {
             if (sender.id != 80000000L) {
                 launch {

@@ -1,16 +1,18 @@
 package org.akteam.miraki.utils
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
+import java.io.IOException
 import java.util.*
+import kotlin.coroutines.resumeWithException
 
 fun String.toMirai(): MessageChain {
     return toMessage().asMessageChain()
@@ -120,19 +122,52 @@ object BotUtil {
         return sb.toString().trim()
     }
 
+    @ExperimentalCoroutinesApi
+    suspend fun Call.await(recordStack: Boolean = false): Response {
+        val callStack = if (recordStack) {
+            IOException().apply {
+                // Remove unnecessary lines from stacktrace
+                // This doesn't remove await$default, but better than nothing
+                stackTrace = stackTrace.copyOfRange(1, stackTrace.size)
+            }
+        } else {
+            null
+        }
+        return suspendCancellableCoroutine { continuation ->
+            enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    continuation.resume(response) {
+                        response.close()
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    // Don't bother with resuming the continuation if it is already cancelled.
+                    if (continuation.isCancelled) return
+                    callStack?.initCause(e)
+                    continuation.resumeWithException(callStack ?: e)
+                }
+            })
+
+            continuation.invokeOnCancellation {
+                try {
+                    cancel()
+                } catch (ex: Throwable) {
+                    //Ignore cancel exception
+                }
+            }
+        }
+    }
+
     suspend fun OkHttpClient.get(url: String): Response {
         val req = Request.Builder()
             .url(url)
             .build()
-        return withContext(Dispatchers.IO) {
-            newCall(req).execute()
-        }
+        return newCall(req).await()
     }
 
     suspend fun OkHttpClient.get(req: Request): Response {
-        return withContext(Dispatchers.IO) {
-            newCall(req).execute()
-        }
+        return newCall(req).await()
     }
 
     suspend fun Response.readText() = withContext(Dispatchers.IO) { body!!.string() }

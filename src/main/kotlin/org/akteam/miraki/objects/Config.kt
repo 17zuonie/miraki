@@ -10,7 +10,7 @@ data class Config(
 ) {
     val netEaseCookie = ""
     val netEaseApi = "localhost:3000"
-    val databaseUrl = "jdbc:postgresql:miraki"
+    val databaseUrl = "jdbc:pgsql://localhost/test"
     val databaseUser = "miraki"
     val jinrishiciToken = "jLiBz0S2lSVPODeBTwnKT5B5Cxz8t5G6" // it is persistent no need to change
     val fetchNoticeDelay = 60 * 1000L
