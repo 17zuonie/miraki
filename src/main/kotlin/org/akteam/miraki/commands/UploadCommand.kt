@@ -15,8 +15,7 @@ class UploadCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
-        CommandProps("upload", arrayListOf("ul", "上传"), "上传文件")
+    override val props = CommandProps("upload", arrayListOf("ul", "上传"), "上传文件")
 
     override fun getHelp(): String {
         TODO("Not yet implemented")

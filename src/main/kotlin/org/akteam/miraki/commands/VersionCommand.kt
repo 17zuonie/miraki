@@ -17,9 +17,7 @@ class VersionCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps {
-        return CommandProps("version", arrayListOf("v", "版本"), "查看版本号")
-    }
+    override val props = CommandProps("version", arrayListOf("v", "版本"), "查看版本号")
 
     override fun getHelp(): String = ""
 }

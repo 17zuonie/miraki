@@ -48,7 +48,7 @@ object CommandExecutor {
             if (isCommandPrefix(event.message.content) /*&& !SessionManager.isValidSession(event.sender.id)*/) {
                 val cmd = getCommand(getCommandName(event.message.contentToString()))
                 if (cmd != null) {
-                    BotMain.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.getProps().name)
+                    BotMain.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.props.name)
 //                return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
                     val splitMessage = event.message.contentToString().split(" ")
                     return doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size)))
@@ -89,7 +89,7 @@ object CommandExecutor {
     }
 
     private fun commandEquals(cmd: UniversalCommand, cmdName: String): Boolean {
-        val props = cmd.getProps()
+        val props = cmd.props
         when {
             props.name.contentEquals(cmdName) -> {
                 return true

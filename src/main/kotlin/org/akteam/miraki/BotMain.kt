@@ -10,10 +10,7 @@ import net.mamoe.mirai.join
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
-import org.akteam.miraki.commands.CommandExecutor
-import org.akteam.miraki.commands.HelpCommand
-import org.akteam.miraki.commands.MusicCommand
-import org.akteam.miraki.commands.VersionCommand
+import org.akteam.miraki.commands.*
 import org.akteam.miraki.listeners.FuckLightAppListener
 import org.akteam.miraki.listeners.MListener
 import kotlin.system.exitProcess
@@ -52,7 +49,9 @@ fun main() = runBlocking<Unit> {
         arrayOf(
             VersionCommand(),
             HelpCommand(),
-            MusicCommand()
+            MusicCommand(),
+            NoticeCommand(),
+            ManageCommand()
 //            UploadCommand()
         )
     )

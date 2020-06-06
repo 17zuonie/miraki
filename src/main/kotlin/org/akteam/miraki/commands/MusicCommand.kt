@@ -22,8 +22,7 @@ class MusicCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override fun getProps(): CommandProps =
-        CommandProps("music", arrayListOf("dg", "点歌", "歌"), "点歌命令")
+    override val props = CommandProps("music", arrayListOf("dg", "点歌", "歌"), "点歌命令")
 
     override fun getHelp(): String = """
         ======= 命令帮助 =======

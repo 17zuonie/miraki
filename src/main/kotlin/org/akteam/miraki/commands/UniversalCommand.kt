@@ -14,7 +14,7 @@ interface UniversalCommand {
     suspend fun execute(event: MessageEvent, args: List<String>): MessageChain
 
     /** 命令属性 */
-    fun getProps(): CommandProps
+    val props: CommandProps
 
     /** 命令帮助文本 必写 不敢自己都看不懂哦 */
     fun getHelp(): String
