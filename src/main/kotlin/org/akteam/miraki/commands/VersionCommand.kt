@@ -4,6 +4,7 @@ import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import org.akteam.miraki.BotMain
+import org.akteam.miraki.objects.UserLevel
 import org.akteam.miraki.utils.BotUtil
 import org.akteam.miraki.utils.toMirai
 
@@ -17,7 +18,7 @@ class VersionCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override val props = CommandProps("version", arrayListOf("v", "版本"), "查看版本号")
+    override val props = CommandProps("version", arrayListOf("v", "版本"), "查看版本号", UserLevel.GUEST)
 
     override fun getHelp(): String = ""
 }

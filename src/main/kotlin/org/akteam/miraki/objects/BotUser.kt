@@ -3,20 +3,21 @@ package org.akteam.miraki.objects
 import me.liuwj.ktorm.entity.Entity
 import me.liuwj.ktorm.schema.*
 
-enum class UserRole {
-    ROOT, ADMIN, TESTER, STUDENT, TEACHER, NORMAL
+enum class UserLevel {
+    ROOT, ADMIN, TEACHER, NORMAL, GUEST
 }
 
 interface BotUser : Entity<BotUser> {
     companion object : Entity.Factory<BotUser>()
 
-    var id: Long
+    var qq: Long
     var trueName: String
-    var role: UserRole
+    var level: UserLevel
+    fun compareLevel(t: UserLevel) = this.level <= t
 }
 
 object BotUsers : Table<BotUser>("aki_user") {
-    val id by long("id").primaryKey().bindTo { it.id }
+    val qq by long("qq").primaryKey().bindTo { it.qq }
     val trueName by varchar("true_name").bindTo { it.trueName }
-    val role by enum("role", typeRef<UserRole>()).bindTo { it.role }
+    val level by enum("level", typeRef<UserLevel>()).bindTo { it.level }
 }

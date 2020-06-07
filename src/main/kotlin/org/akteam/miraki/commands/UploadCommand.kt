@@ -3,6 +3,7 @@ package org.akteam.miraki.commands
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import org.akteam.miraki.objects.UserLevel
 import org.akteam.miraki.utils.BotUtil.getRestString
 import org.akteam.miraki.utils.FileUtil
 import java.io.File
@@ -15,7 +16,7 @@ class UploadCommand : UniversalCommand {
         return EmptyMessageChain
     }
 
-    override val props = CommandProps("upload", arrayListOf("ul", "上传"), "上传文件")
+    override val props = CommandProps("upload", arrayListOf("ul", "上传"), "上传文件", UserLevel.ADMIN)
 
     override fun getHelp(): String {
         TODO("Not yet implemented")
