@@ -10,13 +10,15 @@ import net.mamoe.mirai.join
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
-import org.akteam.miraki.commands.*
+import org.akteam.miraki.command.CommandExecutor
+import org.akteam.miraki.command.subcommands.*
 import org.akteam.miraki.listeners.FuckLightAppListener
 import org.akteam.miraki.listeners.MListener
+import org.akteam.miraki.objects.BotUsers
 import kotlin.system.exitProcess
 
 object BotMain {
-    const val version = "Miraki 2.2"
+    const val version = "Miraki 3.0"
     var startTime: Long = 0
     var qq = 0L
     lateinit var password: String
@@ -26,8 +28,7 @@ object BotMain {
     suspend fun login() {
         val config = BotConfiguration.Default
         config.fileBasedDeviceInfo()
-        bot = Bot(qq = qq, password = password, configuration = config)
-        bot.alsoLogin()
+        bot = Bot(qq = qq, password = password, configuration = config).alsoLogin()
     }
 }
 
@@ -51,8 +52,8 @@ fun main() = runBlocking<Unit> {
             HelpCommand(),
             MusicCommand(),
             NoticeCommand(),
-            ManageCommand()
-//            UploadCommand()
+            ManageCommand(),
+            UploadCommand()
         )
     )
 
@@ -78,6 +79,9 @@ fun main() = runBlocking<Unit> {
     }
 
     BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
+
+    BotUsers.loadUsersFromGroup(BotConsts.cfg.botMainGroup)
+    BotMain.logger.info("[用户] 已加载用户")
 
     BotMain.bot.join() // 等待 Bot 离线, 避免主线程退出
     TODO("Retry login.")

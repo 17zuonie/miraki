@@ -1,8 +1,10 @@
 package org.akteam.miraki
 
+import com.impossibl.postgres.jdbc.PGDataSource
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import me.liuwj.ktorm.database.Database
+import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
 import okhttp3.OkHttpClient
 import org.akteam.miraki.objects.Config
 import java.io.File
@@ -30,20 +32,15 @@ object BotConsts {
         if (!cfgFile.exists()) {
             cfgFile.writeText(json.stringify(Config.serializer(), Config(100000L, "", 10000L)))
         }
-/*        db = Database.connect(
-            cfg.databaseUrl,
-            "org.postgresql.Driver",
-            cfg.databaseUser,
-            dialect = PostgreSqlDialect()
-        )*/
     }
 
     fun load() {
         cfg = json.parse(Config.serializer(), FileReader(cfgFile).readText())
-//        val ds = PGDataSource()
-//        ds.databaseUrl = cfg.databaseUrl
-//        ds.user = cfg.databaseUser
-//        db = Database.connect(ds, dialect = PostgreSqlDialect())
+        val ds = PGDataSource()
+        ds.databaseUrl = cfg.databaseUrl
+        ds.user = cfg.databaseUser
+        ds.password = cfg.databasePassword
+        db = Database.connect(ds, dialect = PostgreSqlDialect())
     }
 
     fun save() {

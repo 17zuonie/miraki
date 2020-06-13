@@ -1,11 +1,13 @@
-package org.akteam.miraki.commands
+package org.akteam.miraki.command.subcommands
 
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import org.akteam.miraki.objects.UserLevel
+import org.akteam.miraki.command.CommandExecutor
+import org.akteam.miraki.command.CommandProps
+import org.akteam.miraki.command.GuestCommand
 import org.akteam.miraki.utils.toMirai
 
-class HelpCommand : UniversalCommand {
+class HelpCommand : GuestCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>): MessageChain {
         val sb = StringBuilder()
         for (cmd in CommandExecutor.commands) {
@@ -17,8 +19,12 @@ class HelpCommand : UniversalCommand {
         return sb.toString().trim().toMirai()
     }
 
-    override val props = CommandProps("help", arrayListOf("?", "帮助", "菜单"), "帮助命令", UserLevel.GUEST)
+    override val props = CommandProps(
+        "help",
+        arrayListOf("?", "帮助", "菜单"),
+        "帮助命令"
+    )
 
     // 它自己就是帮助命令 不需要再帮了
-    override fun getHelp(): String = ""
+    override val help: String = ""
 }

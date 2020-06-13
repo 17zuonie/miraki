@@ -1,10 +1,16 @@
-package org.akteam.miraki.commands
+package org.akteam.miraki.command
 
+import me.liuwj.ktorm.dsl.eq
+import me.liuwj.ktorm.entity.firstOrNull
+import me.liuwj.ktorm.entity.sequenceOf
 import net.mamoe.mirai.message.MessageEvent
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.content
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
-import java.util.*
+import org.akteam.miraki.objects.BotUsers
+import org.akteam.miraki.utils.toMirai
 
 /**
  * Mirai 命令处理器
@@ -46,20 +52,31 @@ object CommandExecutor {
     suspend fun execute(event: MessageEvent): MessageChain {
         try {
             if (isCommandPrefix(event.message.content) /*&& !SessionManager.isValidSession(event.sender.id)*/) {
-                val cmd = getCommand(getCommandName(event.message.contentToString()))
+                val splitMessage = event.message.contentToString().split(" ")
+                val cmd = getCommand(getCommandName(splitMessage))
                 if (cmd != null) {
                     BotMain.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.props.name)
-//                return if (user.compareLevel(cmd.getProps().level) || user.hasPermission(cmd.getProps().permission)) {
-                    val splitMessage = event.message.contentToString().split(" ")
-                    return doFilter(cmd.execute(event, splitMessage.subList(1, splitMessage.size)))
-//                } else {
-//                    BotUtil.sendMsgPrefix("你没有权限!").toMirai()
-//                }
+                    return when (cmd) {
+                        is UserCommand -> {
+                            val user = BotConsts.db.sequenceOf(BotUsers).firstOrNull { it.qq eq event.sender.id }
+                            if (user != null && (user.level >= cmd.level || user.hasPermission(cmd.permission))) {
+                                cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
+                            } else {
+                                BotMain.logger.debug("Rejected.")
+                                "你没有权限!".toMirai()
+                            }
+                        }
+                        is GuestCommand -> {
+                            cmd.execute(event, splitMessage.subList(1, splitMessage.size))
+                        }
+                        else -> EmptyMessageChain
+                    }
                 }
             }
         } catch (e: Exception) {
             BotMain.logger.error("[命令] 出现了不可描述的错误")
             BotMain.logger.error(e)
+            return "出现了不可描述的错误".toMirai()
         }
         return EmptyMessageChain
     }
@@ -73,14 +90,7 @@ object CommandExecutor {
         return null
     }
 
-    private fun getCommandName(command: String): String {
-        var cmdPrefix = command
-        for (string: String in BotConsts.cfg.commandPrefix) {
-            cmdPrefix = cmdPrefix.replace(string, "")
-        }
-
-        return cmdPrefix.split(" ")[0]
-    }
+    private fun getCommandName(splitMessage: List<String>): String = splitMessage[0].substring(1)
 
     private fun isCommandPrefix(message: String): Boolean {
         return BotConsts.cfg.commandPrefix.contains(
@@ -108,7 +118,7 @@ object CommandExecutor {
         return false
     }
 
-    private fun doFilter(chain: MessageChain): MessageChain {
+    /*private fun doFilter(chain: MessageChain): MessageChain {
         if (BotConsts.cfg.filterWords.isNullOrEmpty()) {
             return chain
         }
@@ -136,5 +146,5 @@ object CommandExecutor {
         }
 
         return revampChain.asMessageChain()
-    }
+    }*/
 }
