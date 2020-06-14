@@ -31,5 +31,5 @@ object FuckLightAppListener : MListener {
         }
     }
 
-    override fun getName(): String = "去你大爷的小程序"
+    override val name: String = "去你大爷的小程序"
 }

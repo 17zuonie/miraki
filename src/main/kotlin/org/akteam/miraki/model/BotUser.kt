@@ -1,14 +1,12 @@
 package org.akteam.miraki.model
 
 import me.liuwj.ktorm.dsl.*
-import me.liuwj.ktorm.entity.Entity
-import me.liuwj.ktorm.entity.add
-import me.liuwj.ktorm.entity.associateBy
-import me.liuwj.ktorm.entity.sequenceOf
+import me.liuwj.ktorm.entity.*
 import me.liuwj.ktorm.schema.Table
 import me.liuwj.ktorm.schema.enum
 import me.liuwj.ktorm.schema.long
 import me.liuwj.ktorm.schema.typeRef
+import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.isOperator
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
@@ -34,11 +32,25 @@ interface BotUser : Entity<BotUser> {
             else false
         } else false
     }
+
+    fun maintain(m: Member) {
+        if (m.isOperator() && level < UserLevel.ADMIN) {
+            level = UserLevel.ADMIN
+            flushChanges()
+        }
+    }
 }
 
 object BotUsers : Table<BotUser>("aki_user") {
     val qq by long("qq").primaryKey().bindTo { it.qq }
     val level by enum("level", typeRef<UserLevel>()).bindTo { it.level }
+
+    fun add(member: Member, users: EntitySequence<BotUser, BotUsers> = BotConsts.db.sequenceOf(BotUsers)) {
+        users.add(BotUser {
+            qq = member.id
+            level = if (member.isOperator()) UserLevel.ADMIN else UserLevel.NORMAL
+        })
+    }
 
     fun loadUsersFromGroup(gid: Long = BotConsts.cfg.botMainGroup) {
         val group = BotMain.bot.getGroup(gid)
@@ -46,16 +58,8 @@ object BotUsers : Table<BotUser>("aki_user") {
         val map = users.associateBy { it.qq }
         group.members.forEach {
             val dbUser = map[it.id]
-            if (dbUser == null) users.add(BotUser {
-                qq = it.id
-                level = if (it.isOperator()) UserLevel.ADMIN else UserLevel.NORMAL
-            })
-            else {
-                if (it.isOperator() && dbUser.level < UserLevel.ADMIN) {
-                    dbUser.level = UserLevel.ADMIN
-                    dbUser.flushChanges()
-                }
-            }
+            if (dbUser == null) add(it, users)
+            else dbUser.maintain(it)
         }
     }
 }

@@ -14,6 +14,7 @@ import org.akteam.miraki.command.CommandExecutor
 import org.akteam.miraki.command.subcommand.*
 import org.akteam.miraki.listener.FuckLightAppListener
 import org.akteam.miraki.listener.MListener
+import org.akteam.miraki.listener.NewFriendListener
 import org.akteam.miraki.model.BotUsers
 import kotlin.system.exitProcess
 
@@ -58,13 +59,14 @@ fun main() = runBlocking<Unit> {
     )
 
     val listeners: Array<MListener> = arrayOf(
-        FuckLightAppListener
+        FuckLightAppListener,
+        NewFriendListener
     )
 
     /** 监听器 */
     listeners.forEach {
         it.register(BotMain.bot)
-        BotMain.logger.info("[监听器] 已注册 ${it.getName()} 监听器")
+        BotMain.logger.info("[监听器] 已注册 ${it.name} 监听器")
     }
 
     BotMain.bot.subscribeMessages(priority = Listener.EventPriority.NORMAL) {
