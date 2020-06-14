@@ -1,4 +1,4 @@
-package org.akteam.miraki.command.subcommands
+package org.akteam.miraki.command.subcommand
 
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -7,8 +7,8 @@ import net.mamoe.mirai.message.data.asMessageChain
 import org.akteam.miraki.api.ChunHui
 import org.akteam.miraki.command.CommandProps
 import org.akteam.miraki.command.UserCommand
-import org.akteam.miraki.objects.BotUser
-import org.akteam.miraki.objects.UserLevel
+import org.akteam.miraki.model.BotUser
+import org.akteam.miraki.model.UserLevel
 
 class NoticeCommand : UserCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {

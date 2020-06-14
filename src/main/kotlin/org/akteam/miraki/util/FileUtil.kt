@@ -1,4 +1,4 @@
-package org.akteam.miraki.utils
+package org.akteam.miraki.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

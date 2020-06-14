@@ -11,10 +11,10 @@ import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiLogger
 import org.akteam.miraki.command.CommandExecutor
-import org.akteam.miraki.command.subcommands.*
-import org.akteam.miraki.listeners.FuckLightAppListener
-import org.akteam.miraki.listeners.MListener
-import org.akteam.miraki.objects.BotUsers
+import org.akteam.miraki.command.subcommand.*
+import org.akteam.miraki.listener.FuckLightAppListener
+import org.akteam.miraki.listener.MListener
+import org.akteam.miraki.model.BotUsers
 import kotlin.system.exitProcess
 
 object BotMain {

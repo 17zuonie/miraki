@@ -1,4 +1,4 @@
-package org.akteam.miraki.objects
+package org.akteam.miraki.model
 
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.Entity

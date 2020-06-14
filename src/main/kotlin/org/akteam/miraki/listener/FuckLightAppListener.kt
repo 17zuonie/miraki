@@ -1,4 +1,4 @@
-package org.akteam.miraki.listeners
+package org.akteam.miraki.listener
 
 import kotlinx.serialization.json.content
 import net.mamoe.mirai.Bot

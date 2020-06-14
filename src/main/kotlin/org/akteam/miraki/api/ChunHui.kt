@@ -1,9 +1,9 @@
 package org.akteam.miraki.api
 
 import org.akteam.miraki.BotConsts
-import org.akteam.miraki.objects.ChunHuiNotice
-import org.akteam.miraki.utils.BotUtil.get
-import org.akteam.miraki.utils.BotUtil.readText
+import org.akteam.miraki.model.ChunHuiNotice
+import org.akteam.miraki.util.BotUtils.get
+import org.akteam.miraki.util.BotUtils.readText
 import org.jsoup.Jsoup
 
 object ChunHui {

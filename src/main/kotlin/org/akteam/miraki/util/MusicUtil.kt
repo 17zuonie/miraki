@@ -1,4 +1,4 @@
-package org.akteam.miraki.utils
+package org.akteam.miraki.util
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
@@ -11,8 +11,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
-import org.akteam.miraki.utils.BotUtil.get
-import org.akteam.miraki.utils.BotUtil.readText
+import org.akteam.miraki.util.BotUtils.get
+import org.akteam.miraki.util.BotUtils.readText
 import java.io.IOException
 import java.net.URLEncoder
 

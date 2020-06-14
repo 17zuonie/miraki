@@ -9,8 +9,8 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.content
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
-import org.akteam.miraki.objects.BotUsers
-import org.akteam.miraki.utils.toMirai
+import org.akteam.miraki.model.BotUsers
+import org.akteam.miraki.util.toMirai
 
 /**
  * Mirai 命令处理器

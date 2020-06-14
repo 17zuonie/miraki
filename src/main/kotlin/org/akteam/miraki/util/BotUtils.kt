@@ -1,4 +1,4 @@
-package org.akteam.miraki.utils
+package org.akteam.miraki.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,7 +18,7 @@ fun String.toMirai(): MessageChain {
     return toMessage().asMessageChain()
 }
 
-object BotUtil {
+object BotUtils {
     private var coolDown: MutableMap<Long, Long> = HashMap()
 
     /**

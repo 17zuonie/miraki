@@ -1,11 +1,11 @@
-package org.akteam.miraki.command.subcommands
+package org.akteam.miraki.command.subcommand
 
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import org.akteam.miraki.command.CommandExecutor
 import org.akteam.miraki.command.CommandProps
 import org.akteam.miraki.command.GuestCommand
-import org.akteam.miraki.utils.toMirai
+import org.akteam.miraki.util.toMirai
 
 class HelpCommand : GuestCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>): MessageChain {

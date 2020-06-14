@@ -1,20 +1,20 @@
-package org.akteam.miraki.command.subcommands
+package org.akteam.miraki.command.subcommand
 
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import org.akteam.miraki.command.CommandProps
 import org.akteam.miraki.command.UserCommand
-import org.akteam.miraki.objects.BotUser
-import org.akteam.miraki.objects.UserLevel
-import org.akteam.miraki.utils.BotUtil
-import org.akteam.miraki.utils.BotUtil.getRestString
-import org.akteam.miraki.utils.MusicUtil
-import org.akteam.miraki.utils.toMirai
+import org.akteam.miraki.model.BotUser
+import org.akteam.miraki.model.UserLevel
+import org.akteam.miraki.util.BotUtils
+import org.akteam.miraki.util.BotUtils.getRestString
+import org.akteam.miraki.util.MusicUtil
+import org.akteam.miraki.util.toMirai
 
 class MusicCommand : UserCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtil.isNoCoolDown(event.sender.id)) {
+        if (BotUtils.isNoCoolDown(event.sender.id)) {
             return if (args.isNotEmpty()) {
                 if (args[0] == "下载") {
                     MusicUtil.searchNetEaseMusic(args.getRestString(1), directLink = true)

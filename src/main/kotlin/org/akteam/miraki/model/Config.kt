@@ -1,4 +1,4 @@
-package org.akteam.miraki.objects
+package org.akteam.miraki.model
 
 import kotlinx.serialization.Serializable
 

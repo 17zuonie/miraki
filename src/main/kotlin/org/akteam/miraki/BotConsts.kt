@@ -6,7 +6,7 @@ import kotlinx.serialization.json.JsonConfiguration
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
 import okhttp3.OkHttpClient
-import org.akteam.miraki.objects.Config
+import org.akteam.miraki.model.Config
 import java.io.File
 import java.io.FileReader
 import java.util.concurrent.TimeUnit

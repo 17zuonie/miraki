@@ -1,4 +1,4 @@
-package org.akteam.miraki.listeners
+package org.akteam.miraki.listener
 
 import net.mamoe.mirai.Bot
 
