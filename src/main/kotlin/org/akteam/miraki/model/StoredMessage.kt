@@ -17,11 +17,11 @@ interface StoredGroupMessage : Entity<StoredGroupMessage> {
 }
 
 object StoredGroupMessages : Table<StoredGroupMessage>("aki_stored_message") {
-    val n by int("n").primaryKey().bindTo { it.n }
-    val sourceId by int("source_id").bindTo { it.sourceId }
-    val messageTime by timestamp("message_time").bindTo { it.messageTime }
-    val groupId by long("group_id").bindTo { it.groupId }
-    val senderId by long("sender_id").bindTo { it.senderId }
-    val text by varchar("text").bindTo { it.text }
-    val revoked by boolean("revoked").bindTo { it.revoked }
+    val n = int("n").primaryKey().bindTo { it.n }
+    val sourceId = int("source_id").bindTo { it.sourceId }
+    val messageTime = timestamp("message_time").bindTo { it.messageTime }
+    val groupId = long("group_id").bindTo { it.groupId }
+    val senderId = long("sender_id").bindTo { it.senderId }
+    val text = varchar("text").bindTo { it.text }
+    val revoked = boolean("revoked").bindTo { it.revoked }
 }

@@ -14,27 +14,46 @@ import org.akteam.miraki.command.CommandExecutor
 import org.akteam.miraki.command.subcommand.*
 import org.akteam.miraki.listener.FuckLightAppListener
 import org.akteam.miraki.listener.MListener
+import org.akteam.miraki.listener.MusicVoteListener
 import org.akteam.miraki.listener.NewFriendListener
+import org.akteam.miraki.manager.TaskManager
 import org.akteam.miraki.model.BotUsers
+import org.akteam.miraki.tasks.ChunHuiNoticeUpdater
+import org.akteam.miraki.web.WebMain
+import java.time.LocalDateTime
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 object BotMain {
     const val version = "Miraki 3.0"
-    var startTime: Long = 0
+    lateinit var startTime: LocalDateTime
     var qq = 0L
     lateinit var password: String
     lateinit var bot: Bot
     lateinit var logger: MiraiLogger
+
+    lateinit var service: ScheduledExecutorService
 
     suspend fun login() {
         val config = BotConfiguration.Default
         config.fileBasedDeviceInfo()
         bot = Bot(qq = qq, password = password, configuration = config).alsoLogin()
     }
+
+    fun startUpTask() {
+        TaskManager.runScheduleTaskAsync(
+            ChunHuiNoticeUpdater::run,
+            1L,
+            1L,
+            TimeUnit.MINUTES
+        )
+    }
 }
 
 fun main() = runBlocking<Unit> {
-    BotMain.startTime = System.currentTimeMillis()
+    BotMain.startTime = LocalDateTime.now()
     BotConsts.init()
     BotConsts.load()
 
@@ -45,6 +64,14 @@ fun main() = runBlocking<Unit> {
         exitProcess(0)
     }
     BotMain.login()
+    Runtime.getRuntime().addShutdownHook(Thread {
+        runBlocking {
+            WebMain.server.stop(2000, 5000)
+            BotMain.service.shutdown()
+            BotMain.bot.close(null)
+        }
+    })
+
     BotMain.logger = BotMain.bot.logger
 
     CommandExecutor.setupCommand(
@@ -53,14 +80,14 @@ fun main() = runBlocking<Unit> {
             HelpCommand(),
             MusicCommand(),
             NoticeCommand(),
-            ManageCommand(),
-            UploadCommand()
+            ManageCommand()
         )
     )
 
     val listeners: Array<MListener> = arrayOf(
         FuckLightAppListener,
-        NewFriendListener
+        NewFriendListener,
+        MusicVoteListener
     )
 
     /** 监听器 */
@@ -82,8 +109,13 @@ fun main() = runBlocking<Unit> {
 
     BotMain.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
 
-    BotUsers.loadUsersFromGroup(BotConsts.cfg.botMainGroup)
+    BotUsers.loadUsers()
     BotMain.logger.info("[用户] 已加载用户")
+
+    BotMain.service = Executors.newScheduledThreadPool(4)
+    BotMain.startUpTask()
+
+    WebMain.run()
 
     BotMain.bot.join() // 等待 Bot 离线, 避免主线程退出
     TODO("Retry login.")

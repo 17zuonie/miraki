@@ -13,8 +13,8 @@ interface UserPermission : Entity<UserPermission> {
 }
 
 object UserPermissions : Table<UserPermission>("aki_user") {
-    val id by int("id").primaryKey().bindTo { it.id }
-    val qq by long("qq").bindTo { it.qq }
-    val permission by varchar("permission").bindTo { it.permission }
-    val grant by boolean("grant").bindTo { it.grant }
+    val id = int("id").primaryKey().bindTo { it.id }
+    val qq = long("qq").bindTo { it.qq }
+    val permission = varchar("permission").bindTo { it.permission }
+    val grant = boolean("grant").bindTo { it.grant }
 }

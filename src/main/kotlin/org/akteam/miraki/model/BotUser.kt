@@ -1,13 +1,9 @@
 package org.akteam.miraki.model
 
-import me.liuwj.ktorm.dsl.*
+import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.entity.*
-import me.liuwj.ktorm.schema.Table
-import me.liuwj.ktorm.schema.enum
-import me.liuwj.ktorm.schema.long
-import me.liuwj.ktorm.schema.typeRef
-import net.mamoe.mirai.contact.Member
-import net.mamoe.mirai.contact.isOperator
+import me.liuwj.ktorm.schema.*
+import net.mamoe.mirai.contact.Friend
 import org.akteam.miraki.BotConsts
 import org.akteam.miraki.BotMain
 
@@ -20,46 +16,36 @@ interface BotUser : Entity<BotUser> {
 
     var qq: Long
     var level: UserLevel
-
-    fun hasPermission(t: String?): Boolean {
-        return if (t != null) {
-            val p = BotConsts.db.from(UserPermissions)
-                .select(UserPermissions.grant)
-                .where { (UserPermissions.qq eq qq) and (UserPermissions.permission eq t) }
-                .firstOrNull()
-
-            if (p != null) p[UserPermissions.grant]!!
-            else false
-        } else false
-    }
-
-    fun maintain(m: Member) {
-        if (m.isOperator() && level < UserLevel.ADMIN) {
-            level = UserLevel.ADMIN
-            flushChanges()
-        }
-    }
+    var subChunHuiNotice: Boolean
 }
 
 object BotUsers : Table<BotUser>("aki_user") {
-    val qq by long("qq").primaryKey().bindTo { it.qq }
-    val level by enum("level", typeRef<UserLevel>()).bindTo { it.level }
+    val qq = long("qq").primaryKey().bindTo { it.qq }
+    val level = enum("level", typeRef<UserLevel>()).bindTo { it.level }
+    val subChunHuiNotice = boolean("sub_chnotice").bindTo { it.subChunHuiNotice }
 
-    fun add(member: Member, users: EntitySequence<BotUser, BotUsers> = BotConsts.db.sequenceOf(BotUsers)) {
+    fun add(friend: Friend, users: EntitySequence<BotUser, BotUsers> = BotConsts.db.sequenceOf(BotUsers)) {
         users.add(BotUser {
-            qq = member.id
-            level = if (member.isOperator()) UserLevel.ADMIN else UserLevel.NORMAL
+            qq = friend.id
+            level = UserLevel.NORMAL
         })
     }
 
-    fun loadUsersFromGroup(gid: Long = BotConsts.cfg.botMainGroup) {
-        val group = BotMain.bot.getGroup(gid)
+    fun loadUsers() {
+        val friends = BotMain.bot.friends
         val users = BotConsts.db.sequenceOf(BotUsers)
         val map = users.associateBy { it.qq }
-        group.members.forEach {
+        map.forEach { // https://github.com/kotlin-orm/ktorm/issues/124#issuecomment-608982814 查询结果不能遍历第二遍（创建 map 时算第一遍）
+            val friend = friends.getOrNull(it.value.qq)
+            if (friend == null) it.value.delete()
+        }
+        friends.forEach {
             val dbUser = map[it.id]
             if (dbUser == null) add(it, users)
-            else dbUser.maintain(it)
         }
+    }
+
+    fun get(qq: Long): BotUser? {
+        return BotConsts.db.sequenceOf(BotUsers).find { it.qq eq qq }
     }
 }

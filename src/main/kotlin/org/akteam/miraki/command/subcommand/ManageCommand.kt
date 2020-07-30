@@ -20,7 +20,7 @@ class ManageCommand : UserCommand {
                     return "配置保存了".toMirai()
                 }
                 "userReload" -> {
-                    BotUsers.loadUsersFromGroup()
+                    BotUsers.loadUsers()
                     return "用户已经重新加载".toMirai()
                 }
             }
@@ -37,7 +37,7 @@ class ManageCommand : UserCommand {
 
     override val help: String = """
         ======= 命令帮助 =======
-        /manage save -> 保存配置文件
-        /manage userReload -> 重新加载用户
+        -manage save -> 保存配置文件
+        -manage userReload -> 重新加载用户
     """.trimIndent()
 }

@@ -1,29 +1,71 @@
 package org.akteam.miraki.command.subcommand
 
+import me.liuwj.ktorm.dsl.eq
+import me.liuwj.ktorm.entity.add
+import me.liuwj.ktorm.entity.find
+import me.liuwj.ktorm.entity.sequenceOf
 import net.mamoe.mirai.message.MessageEvent
-import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.asMessageChain
+import org.akteam.miraki.BotConsts
 import org.akteam.miraki.command.CommandProps
 import org.akteam.miraki.command.UserCommand
 import org.akteam.miraki.model.BotUser
+import org.akteam.miraki.model.Playlist
+import org.akteam.miraki.model.Playlists
 import org.akteam.miraki.model.UserLevel
 import org.akteam.miraki.util.BotUtils
 import org.akteam.miraki.util.BotUtils.getRestString
 import org.akteam.miraki.util.MusicUtil
 import org.akteam.miraki.util.toMirai
+import org.akteam.miraki.web.JwtConfig
+import java.time.Instant
 
 class MusicCommand : UserCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
-        if (BotUtils.isNoCoolDown(event.sender.id)) {
-            return if (args.isNotEmpty()) {
-                if (args[0] == "下载") {
-                    MusicUtil.searchNetEaseMusic(args.getRestString(1), directLink = true)
-                } else MusicUtil.searchNetEaseMusic(args.getRestString(0))
-            } else {
-                help.toMirai()
+        return if (args.isNotEmpty()) {
+            when (args[0]) {
+                "创建歌单" -> {
+                    if (user.level < UserLevel.ADMIN) "没有权限".toMirai()
+                    try {
+                        val pl = Playlist {
+                            startTime = Instant.now()
+                            endTime = null
+                        }
+                        BotConsts.db.sequenceOf(Playlists).add(pl)
+                        "成功，歌单 ID 为 ${pl.n}".toMirai()
+                    } catch (e: Exception) {
+                        "出现错误 ${e.message}".toMirai()
+                    }
+                }
+                "终止歌单" -> {
+                    if (user.level < UserLevel.ADMIN) "没有权限".toMirai()
+                    try {
+                        val pl = BotConsts.db.sequenceOf(Playlists).find { it.n eq args[1].toInt() }
+                        if (pl == null) "失败，歌单不存在".toMirai()
+                        else {
+                            pl.endTime = Instant.now()
+                            pl.flushChanges()
+                            "成功，歌单 ${pl.n} 已终止".toMirai()
+                        }
+                    } catch (e: Exception) {
+                        "出现错误 ${e.message}".toMirai()
+                    }
+                }
+                "投票" -> {
+                    BotUtils.sendLinkCard(
+                        "专属午休歌投票通道",
+                        "有效期十五分钟，请不要泄漏给别人哦",
+                        "${BotConsts.cfg.httpApiUrl}#/auth/${JwtConfig.makeToken(user)}",
+                        "[链接]午休歌投票"
+                    ).asMessageChain()
+                }
+                "下载" -> MusicUtil.searchNetEaseMusic(args.getRestString(1), directLink = true)
+                else -> MusicUtil.searchNetEaseMusic(args.getRestString(1))
             }
+        } else {
+            help.toMirai()
         }
-        return EmptyMessageChain
     }
 
     override val props =
@@ -35,7 +77,11 @@ class MusicCommand : UserCommand {
 
     override val help: String = """
         ======= 命令帮助 =======
-        /music [歌名] -> 点歌
-        /music 下载 [歌名] -> 获得音乐 MP3 链接
+        直接把歌曲分享过来 -> 投稿
+        -music [歌名] -> 点歌
+        -music 下载 [歌名] -> 获得音乐 MP3 链接
+        -music 投票 -> 获得投票链接
+        -music 创建歌单 -> 新建一个歌单
+        -music 终止歌单 <歌单ID> -> 结束指定 ID 的歌单的投稿
     """.trimIndent()
 }

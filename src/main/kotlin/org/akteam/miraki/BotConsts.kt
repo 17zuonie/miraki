@@ -30,7 +30,7 @@ object BotConsts {
 
     fun init() {
         if (!cfgFile.exists()) {
-            cfgFile.writeText(json.stringify(Config.serializer(), Config(100000L, "", 10000L)))
+            cfgFile.writeText(json.stringify(Config.serializer(), Config(100000L, "")))
         }
     }
 

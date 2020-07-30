@@ -59,7 +59,7 @@ object CommandExecutor {
                     return when (cmd) {
                         is UserCommand -> {
                             val user = BotConsts.db.sequenceOf(BotUsers).firstOrNull { it.qq eq event.sender.id }
-                            if (user != null && (user.level >= cmd.level || user.hasPermission(cmd.permission))) {
+                            if (user != null && user.level >= cmd.level) {
                                 cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
                             } else {
                                 BotMain.logger.debug("Rejected.")

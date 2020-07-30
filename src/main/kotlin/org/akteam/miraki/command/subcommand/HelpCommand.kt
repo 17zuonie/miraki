@@ -12,7 +12,7 @@ class HelpCommand : GuestCommand {
         val sb = StringBuilder()
         for (cmd in CommandExecutor.commands) {
             if (cmd.props.name.contentEquals("help") || !cmd.props.name.contentEquals("debug")) {
-                sb.append("/").append(cmd.props.name).append("  ").append(cmd.props.description).append("\n")
+                sb.append("-").append(cmd.props.name).append("  ").append(cmd.props.description).append("\n")
             }
         }
 
