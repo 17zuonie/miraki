@@ -52,7 +52,7 @@ object BotMain {
     }
 }
 
-fun main() = runBlocking<Unit> {
+fun main(args: Array<String>) = runBlocking<Unit> {
     BotMain.startTime = LocalDateTime.now()
     BotConsts.init()
     BotConsts.load()
@@ -115,7 +115,7 @@ fun main() = runBlocking<Unit> {
     BotMain.service = Executors.newScheduledThreadPool(4)
     BotMain.startUpTask()
 
-    WebMain.run()
+    WebMain.run(args, wait = false)
 
     BotMain.bot.join() // 等待 Bot 离线, 避免主线程退出
     TODO("Retry login.")

@@ -23,6 +23,15 @@ CREATE TABLE aki_playlist(
     end_time timestamp
 );
 
+CREATE TABLE aki_liked_music(
+    n serial PRIMARY KEY,
+    qq bigint NOT NULL,
+    sub_time timestamp NOT NULL,
+
+    music_id int NOT NULL,
+    playlist_id int NOT NULL
+);
+
 CREATE TABLE aki_user(
     qq bigint PRIMARY KEY,
     level varchar(10) NOT NULL,
