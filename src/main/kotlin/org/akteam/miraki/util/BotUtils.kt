@@ -23,7 +23,7 @@ fun String.toMirai(): MessageChain {
 object BotUtils {
     fun getRunningTime(): String {
         val remain = Duration.between(BotMain.startTime, LocalDateTime.now())
-        return "${remain.toDaysPart()}天${remain.toHoursPart()}时${remain.toMinutesPart()}分${remain.toSecondsPart()}秒${remain.toMillisPart()}毫秒"
+        return "${remain.toDays()}天${remain.toHours() % 24L}时${remain.toMinutes() % 60L}分${remain.toSeconds() % 60L}秒$"
     }
 
     fun List<String>.getRestString(startAt: Int): String {
