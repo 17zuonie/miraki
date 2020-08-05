@@ -13,7 +13,7 @@ repositories {
     maven {
         url = uri("https://maven.aliyun.com/repository/public")
     }
-//    mavenCentral()
+    mavenCentral()
     maven {
         url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
     }
