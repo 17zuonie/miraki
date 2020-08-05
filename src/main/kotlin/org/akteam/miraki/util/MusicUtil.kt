@@ -9,8 +9,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.akteam.miraki.BotConsts
-import org.akteam.miraki.BotMain
+import org.akteam.miraki.BotVariables
 import org.akteam.miraki.util.BotUtils.get
 import org.akteam.miraki.util.BotUtils.readText
 import java.io.IOException
@@ -24,8 +23,8 @@ object MusicUtil {
 
     suspend fun searchNetEaseMusic(songName: String, directLink: Boolean = false): MessageChain {
         try {
-            BotMain.logger.debug(
-                "http://${BotConsts.cfg.netEaseApi}/search?keywords=${
+            BotVariables.logger.debug(
+                "http://${BotVariables.cfg.netEaseApi}/search?keywords=${
                     URLEncoder.encode(
                         songName,
                         "UTF-8"
@@ -33,7 +32,7 @@ object MusicUtil {
                 }"
             )
             val rep = client.get(
-                "http://${BotConsts.cfg.netEaseApi}/search?keywords=${
+                "http://${BotVariables.cfg.netEaseApi}/search?keywords=${
                     URLEncoder.encode(
                         songName,
                         "UTF-8"
@@ -48,9 +47,9 @@ object MusicUtil {
                     .jsonObject["id"]!!
                     .int
                 val musicUrl = "https://music.163.com/#/song?id=$musicId"
-                val songResult = client.get("http://${BotConsts.cfg.netEaseApi}/song/detail?ids=$musicId").readText()
+                val songResult = client.get("http://${BotVariables.cfg.netEaseApi}/song/detail?ids=$musicId").readText()
 
-                BotMain.logger.debug("http://${BotConsts.cfg.netEaseApi}/song/detail?ids=$musicId")
+                BotVariables.logger.debug("http://${BotVariables.cfg.netEaseApi}/song/detail?ids=$musicId")
 
                 val songJson = json.parseJson(songResult)
                 val albumUrl = songJson
@@ -72,14 +71,14 @@ object MusicUtil {
 
                 artistName = artistName.substring(0, artistName.length - 1)
 
-                val playResult = if (BotConsts.cfg.netEaseApi.isEmpty()) {
-                    client.get("http://${BotConsts.cfg.netEaseApi}/song/url?id=$musicId")
+                val playResult = if (BotVariables.cfg.netEaseApi.isEmpty()) {
+                    client.get("http://${BotVariables.cfg.netEaseApi}/song/url?id=$musicId")
                 } else {
                     val req = Request.Builder()
-                        .url("http://${BotConsts.cfg.netEaseApi}/song/url?id=$musicId")
-                        .header("Cookie", BotConsts.cfg.netEaseCookie)
+                        .url("http://${BotVariables.cfg.netEaseApi}/song/url?id=$musicId")
+                        .header("Cookie", BotVariables.cfg.netEaseCookie)
                         .build()
-                    BotMain.logger.debug(req.headers.toString())
+                    BotVariables.logger.debug(req.headers.toString())
 
                     client.get(req)
                 }
@@ -126,7 +125,7 @@ object MusicUtil {
                 }
             }
         } catch (e: IOException) {
-            BotMain.logger.error(e)
+            BotVariables.logger.error(e)
         }
         return "找不到歌曲".toMirai()
     }
@@ -191,9 +190,9 @@ object MusicUtil {
                         ).asMessageChain()
                     }
                 }
-            } else BotMain.logger.debug("无法从 API 获取到歌曲信息, 响应码为 " + songResult.status)
+            } else BotVariables.logger.debug("无法从 API 获取到歌曲信息, 响应码为 " + songResult.status)
         } catch (x: Exception) {
-            BotMain.logger.error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x)
+            BotVariables.logger.error("在通过 QQ 音乐搜索歌曲时发生了一个错误, ", x)
         }
         return "找不到歌曲".toMessage().asMessageChain()
     }

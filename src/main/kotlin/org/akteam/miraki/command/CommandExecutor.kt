@@ -7,8 +7,7 @@ import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.content
-import org.akteam.miraki.BotConsts
-import org.akteam.miraki.BotMain
+import org.akteam.miraki.BotVariables
 import org.akteam.miraki.model.BotUsers
 import org.akteam.miraki.util.toMirai
 
@@ -55,14 +54,14 @@ object CommandExecutor {
                 val splitMessage = event.message.contentToString().split(" ")
                 val cmd = getCommand(getCommandName(splitMessage))
                 if (cmd != null) {
-                    BotMain.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.props.name)
+                    BotVariables.logger.debug("[命令] " + event.sender.id + " 执行了命令: " + cmd.props.name)
                     return when (cmd) {
                         is UserCommand -> {
-                            val user = BotConsts.db.sequenceOf(BotUsers).firstOrNull { it.qq eq event.sender.id }
-                            if (user != null && user.level >= cmd.level) {
+                            val user = BotVariables.db.sequenceOf(BotUsers).firstOrNull { it.qq eq event.sender.id }
+                            if (user != null && user.hasPermission(cmd.level)) {
                                 cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
                             } else {
-                                BotMain.logger.debug("Rejected.")
+                                BotVariables.logger.debug("Rejected.")
                                 "你没有权限!".toMirai()
                             }
                         }
@@ -74,8 +73,8 @@ object CommandExecutor {
                 }
             }
         } catch (e: Exception) {
-            BotMain.logger.error("[命令] 出现了不可描述的错误")
-            BotMain.logger.error(e)
+            BotVariables.logger.error("[命令] 出现了不可描述的错误")
+            BotVariables.logger.error(e)
             return "出现了不可描述的错误".toMirai()
         }
         return EmptyMessageChain
@@ -93,7 +92,7 @@ object CommandExecutor {
     private fun getCommandName(splitMessage: List<String>): String = splitMessage[0].substring(1)
 
     private fun isCommandPrefix(message: String): Boolean {
-        return BotConsts.cfg.commandPrefix.contains(
+        return BotVariables.cfg.commandPrefix.contains(
             message.substring(0, 1)
         ) && message.isNotEmpty()
     }

@@ -3,7 +3,7 @@ package org.akteam.miraki.command.subcommand
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.EmptyMessageChain
 import net.mamoe.mirai.message.data.MessageChain
-import org.akteam.miraki.BotConsts
+import org.akteam.miraki.BotVariables
 import org.akteam.miraki.command.CommandProps
 import org.akteam.miraki.command.UserCommand
 import org.akteam.miraki.model.BotUser
@@ -16,7 +16,7 @@ class ManageCommand : UserCommand {
         if (args.isNotEmpty()) {
             when (args[0]) {
                 "save" -> {
-                    BotConsts.save()
+                    BotVariables.save()
                     return "配置保存了".toMirai()
                 }
                 "userReload" -> {

@@ -7,7 +7,7 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.akteam.miraki.BotMain
+import org.akteam.miraki.BotVariables
 import java.io.File
 
 object FileUtil {
@@ -28,8 +28,8 @@ object FileUtil {
 
         withContext(Dispatchers.IO) {
             client.newCall(request).execute().use {
-                if (!it.isSuccessful) BotMain.logger.error(it.toString())
-                else BotMain.logger.debug(it.body!!.string())
+                if (!it.isSuccessful) BotVariables.logger.error(it.toString())
+                else BotVariables.logger.debug(it.body!!.string())
             }
         }
     }

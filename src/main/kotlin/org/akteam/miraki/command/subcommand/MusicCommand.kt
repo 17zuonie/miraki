@@ -7,7 +7,7 @@ import me.liuwj.ktorm.entity.sequenceOf
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
-import org.akteam.miraki.BotConsts
+import org.akteam.miraki.BotVariables
 import org.akteam.miraki.command.CommandProps
 import org.akteam.miraki.command.UserCommand
 import org.akteam.miraki.model.BotUser
@@ -26,22 +26,22 @@ class MusicCommand : UserCommand {
         return if (args.isNotEmpty()) {
             when (args[0]) {
                 "创建歌单" -> {
-                    if (user.level < UserLevel.ADMIN) "没有权限".toMirai()
+                    if (user.hasPermission(UserLevel.ADMIN)) "没有权限".toMirai()
                     try {
                         val pl = Playlist {
                             startTime = Instant.now()
                             endTime = null
                         }
-                        BotConsts.db.sequenceOf(Playlists).add(pl)
+                        BotVariables.db.sequenceOf(Playlists).add(pl)
                         "成功，歌单 ID 为 ${pl.n}".toMirai()
                     } catch (e: Exception) {
                         "出现错误 ${e.message}".toMirai()
                     }
                 }
                 "终止歌单" -> {
-                    if (user.level < UserLevel.ADMIN) "没有权限".toMirai()
+                    if (user.hasPermission(UserLevel.ADMIN)) "没有权限".toMirai()
                     try {
-                        val pl = BotConsts.db.sequenceOf(Playlists).find { it.n eq args[1].toInt() }
+                        val pl = BotVariables.db.sequenceOf(Playlists).find { it.n eq args[1].toInt() }
                         if (pl == null) "失败，歌单不存在".toMirai()
                         else {
                             pl.endTime = Instant.now()
@@ -56,7 +56,7 @@ class MusicCommand : UserCommand {
                     BotUtils.sendLinkCard(
                         "专属午休歌投票通道",
                         "有效期十五分钟，请不要泄漏给别人哦",
-                        "${BotConsts.cfg.httpApiUrl}#/auth/${JwtConfig.makeToken(user)}",
+                        "${BotVariables.cfg.httpApiUrl}#/auth/${JwtConfig.makeToken(user)}",
                         "[链接]午休歌投票"
                     ).asMessageChain()
                 }

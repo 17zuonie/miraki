@@ -3,12 +3,12 @@ package org.akteam.miraki.web
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import org.akteam.miraki.BotConsts
+import org.akteam.miraki.BotVariables
 import org.akteam.miraki.model.BotUser
 import java.util.*
 
 object JwtConfig {
-    private val secret = BotConsts.cfg.jwtSecret
+    private val secret = BotVariables.cfg.jwtSecret
     private const val issuer = "aki"
     private const val audience = "happy"
     const val realm = "Aki Server"

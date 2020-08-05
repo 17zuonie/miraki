@@ -5,14 +5,18 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.utils.MiraiLogger
 import okhttp3.OkHttpClient
 import org.akteam.miraki.model.Config
 import java.io.File
 import java.io.FileReader
 import java.util.concurrent.TimeUnit
 
-object BotConsts {
+object BotVariables {
     private val cfgFile = File("config.json")
+    lateinit var bot: Bot
+    lateinit var logger: MiraiLogger
     lateinit var cfg: Config
     lateinit var db: Database
 

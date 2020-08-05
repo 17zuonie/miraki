@@ -10,7 +10,7 @@ import me.liuwj.ktorm.schema.Table
 import me.liuwj.ktorm.schema.int
 import me.liuwj.ktorm.schema.long
 import me.liuwj.ktorm.schema.timestamp
-import org.akteam.miraki.BotConsts
+import org.akteam.miraki.BotVariables
 import java.time.Instant
 
 interface UserLikedMusic : Entity<UserLikedMusic> {
@@ -32,7 +32,7 @@ object UserLikedMusics : Table<UserLikedMusic>("aki_liked_music") {
     val playlistId = int("playlist_id").bindTo { it.playlistId }
     val subTime = timestamp("sub_time").bindTo { it.subTime }
 
-    fun liked(qq: Long, music: RecommendMusic) = BotConsts.db.sequenceOf(this)
+    fun liked(qq: Long, music: RecommendMusic) = BotVariables.db.sequenceOf(this)
         .filter { (it.qq eq qq) and (it.musicId eq music.n) and (it.playlistId eq music.playlistId) }
         .count()
 }

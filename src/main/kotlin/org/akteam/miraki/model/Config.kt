@@ -18,14 +18,7 @@ data class Config(
     val jinrishiciToken = "jLiBz0S2lSVPODeBTwnKT5B5Cxz8t5G6" // it is persistent no need to change
     val jwtSecret = randomUUID()!!.toString() // 随机一个 secret 不一定要是 UUID
     val httpApiUrl = "http://localhost:8080/"
-    val fetchNoticeDelay = 60 * 1000L
+    val fetchNoticeDelay = 60L
 
-    val antiRevokeGroups = listOf<Long>(187410654)
-    val longwangLookupGroups = listOf<Long>(187410654)
-    val noticeBroadcastGroups = listOf<Long>(187410654)
-    val botMainGroup = 187410654L
-
-    val commandPrefix = listOf("-", ".", "!", "#", "/", " ")
-    val filterWords: List<String> = listOf()
-    val coolDownTime: Int = 7
+    val commandPrefix = listOf("-", ".", "!", "#", "/")
 }

@@ -10,6 +10,7 @@ import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.toMessage
 import okhttp3.*
 import org.akteam.miraki.BotMain
+import org.akteam.miraki.BotVariables
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
@@ -42,7 +43,7 @@ object BotUtils {
         desc: String,
         jumpUrl: String,
         prompt: String = "[分享]一条链接",
-        preview: String = BotMain.bot.selfQQ.avatarUrl,
+        preview: String = BotVariables.bot.selfQQ.avatarUrl,
         tag: String = "Aki"
     ) = LightApp(
         """

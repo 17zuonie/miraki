@@ -4,7 +4,7 @@ import kotlinx.serialization.json.content
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.LightApp
-import org.akteam.miraki.BotConsts.json
+import org.akteam.miraki.BotVariables.json
 
 object FuckLightAppListener : MListener {
     override fun register(bot: Bot) {

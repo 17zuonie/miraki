@@ -1,6 +1,6 @@
 package org.akteam.miraki.api
 
-import org.akteam.miraki.BotConsts
+import org.akteam.miraki.BotVariables
 import org.akteam.miraki.model.ChunHuiNotice
 import org.akteam.miraki.util.BotUtils.get
 import org.akteam.miraki.util.BotUtils.readText
@@ -8,7 +8,7 @@ import org.jsoup.Jsoup
 
 object ChunHuiApi {
     suspend fun fetchNotice(): ChunHuiNotice {
-        val html = BotConsts.http.get(BotConsts.cfg.chunHuiUrl)
+        val html = BotVariables.http.get(BotVariables.cfg.chunHuiUrl)
         val doc = Jsoup.parse(html.readText())
         val row = doc.selectFirst(".school-notice .row")
 

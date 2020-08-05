@@ -10,7 +10,7 @@ import me.liuwj.ktorm.entity.sequenceOf
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeFriendMessages
 import net.mamoe.mirai.message.data.LightApp
-import org.akteam.miraki.BotConsts
+import org.akteam.miraki.BotVariables
 import org.akteam.miraki.model.BotUsers
 import org.akteam.miraki.model.Playlists
 import org.akteam.miraki.model.RecommendMusic
@@ -24,13 +24,13 @@ object MusicVoteListener : MListener {
             always {
                 val card = message[LightApp]
                 if (card != null) {
-                    val jsonObject = BotConsts.json.parseJson(card.content).jsonObject
+                    val jsonObject = BotVariables.json.parseJson(card.content).jsonObject
                     val meta = jsonObject["meta"]!!.jsonObject
                     val music = meta["music"]
                     if (music != null && music is JsonObject) {
                         if (BotUsers.get(qq = sender.id) == null) return@always
                         val now = Instant.now()!!
-                        val playlist = BotConsts.db.sequenceOf(Playlists).filter {
+                        val playlist = BotVariables.db.sequenceOf(Playlists).filter {
                             (Playlists.startTime less now) and
                                     (Playlists.endTime.isNull() or (Playlists.endTime greater now))
                         }.firstOrNull()
@@ -54,7 +54,7 @@ object MusicVoteListener : MListener {
                             musicUrl = music["musicUrl"]!!.content
                             previewUrl = music["preview"]!!.content
                         }
-                        val seq = BotConsts.db.sequenceOf(RecommendMusics)
+                        val seq = BotVariables.db.sequenceOf(RecommendMusics)
                         for (m in seq) {
                             if (new.eq(m)) {
                                 reply("抱歉啦，这首歌已经放在列表里了哦")

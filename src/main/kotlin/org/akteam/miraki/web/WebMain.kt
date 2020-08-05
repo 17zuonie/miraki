@@ -15,8 +15,7 @@ import me.liuwj.ktorm.entity.add
 import me.liuwj.ktorm.entity.find
 import me.liuwj.ktorm.entity.map
 import me.liuwj.ktorm.entity.sequenceOf
-import org.akteam.miraki.BotConsts
-import org.akteam.miraki.BotMain
+import org.akteam.miraki.BotVariables
 import org.akteam.miraki.model.RecommendMusics
 import org.akteam.miraki.model.UserLevel
 import org.akteam.miraki.model.UserLikedMusic
@@ -48,11 +47,11 @@ fun Application.main() {
     routing {
         authenticate(optional = true) {
             get("/songs") {
-                val seq = BotConsts.db.sequenceOf(RecommendMusics)
+                val seq = BotVariables.db.sequenceOf(RecommendMusics)
 
                 val list = seq
                     .map {
-                        val friend = BotMain.bot.friends[it.qq]
+                        val friend = BotVariables.bot.friends[it.qq]
                         Response.Song(it, friend)
                     }
                 call.respond(list)
@@ -74,14 +73,14 @@ fun Application.main() {
             }
 
             post("/song/{id}/like") {
-                val seq = BotConsts.db.sequenceOf(RecommendMusics)
+                val seq = BotVariables.db.sequenceOf(RecommendMusics)
                 val song = seq.find { it.n eq call.parameters["id"]!!.toInt() }!!
                 val user = call.user()!!
 
                 // 管理员特权？
-                if (user.level >= UserLevel.ADMIN || UserLikedMusics.liked(user.qq, song) == 0) {
+                if (user.hasPermission(UserLevel.ADMIN) || UserLikedMusics.liked(user.qq, song) == 0) {
                     // 使用事务，保证一致性
-                    BotConsts.db.useTransaction {
+                    BotVariables.db.useTransaction {
                         song.like++
                         val record = UserLikedMusic {
                             qq = user.qq
@@ -90,7 +89,7 @@ fun Application.main() {
                             subTime = Instant.now()
                         }
 
-                        BotConsts.db.sequenceOf(UserLikedMusics).add(record)
+                        BotVariables.db.sequenceOf(UserLikedMusics).add(record)
                         song.flushChanges()
                     }
                     call.respond(mapOf("OK" to true))
