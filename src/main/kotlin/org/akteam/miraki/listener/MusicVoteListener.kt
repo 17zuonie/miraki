@@ -19,7 +19,6 @@ import java.time.Instant
 
 object MusicVoteListener : MListener {
 
-
     override fun register(bot: Bot) {
         bot.subscribeFriendMessages {
             always {

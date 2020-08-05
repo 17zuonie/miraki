@@ -25,16 +25,20 @@ object MusicUtil {
     suspend fun searchNetEaseMusic(songName: String, directLink: Boolean = false): MessageChain {
         try {
             BotMain.logger.debug(
-                "http://${BotConsts.cfg.netEaseApi}/search?keywords=${URLEncoder.encode(
-                    songName,
-                    "UTF-8"
-                )}"
+                "http://${BotConsts.cfg.netEaseApi}/search?keywords=${
+                    URLEncoder.encode(
+                        songName,
+                        "UTF-8"
+                    )
+                }"
             )
             val rep = client.get(
-                "http://${BotConsts.cfg.netEaseApi}/search?keywords=${URLEncoder.encode(
-                    songName,
-                    "UTF-8"
-                )}"
+                "http://${BotConsts.cfg.netEaseApi}/search?keywords=${
+                    URLEncoder.encode(
+                        songName,
+                        "UTF-8"
+                    )
+                }"
             )
             if (rep.isSuccessful) {
                 val searchResult = json.parseJson(rep.readText()).jsonObject

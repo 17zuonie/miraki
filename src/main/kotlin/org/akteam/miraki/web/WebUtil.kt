@@ -1,8 +1,8 @@
 package org.akteam.miraki.web
 
-import io.ktor.application.ApplicationCall
-import io.ktor.auth.authentication
-import io.ktor.auth.jwt.JWTPrincipal
+import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.entity.find
 import me.liuwj.ktorm.entity.sequenceOf
