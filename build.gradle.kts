@@ -27,7 +27,7 @@ object Versions {
     const val mirai = "1.1.3"
 
     object Kotlin {
-        const val stdlib = "1.3.72"
+        const val stdlib = "1.3.70"
         const val coroutines = "1.3.7"
         const val atomicFU = "0.14.2"
         const val serialization = "0.20.0"
@@ -45,8 +45,8 @@ object Versions {
 }
 
 dependencies {
-    implementation(mirai("core-jvm"))
-    implementation(mirai("core-qqandroid-jvm"))
+    implementation(mirai("core"))
+    implementation(mirai("core-qqandroid"))
 
     implementation(kotlinx("serialization-runtime", Versions.Kotlin.serialization))
 
