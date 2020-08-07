@@ -9,7 +9,7 @@ import org.akteam.miraki.command.UserCommand
 import org.akteam.miraki.model.BotUser
 import org.akteam.miraki.model.BotUsers
 import org.akteam.miraki.model.UserLevel
-import org.akteam.miraki.util.toMirai
+import org.akteam.miraki.util.toMsgChain
 
 class ManageCommand : UserCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser): MessageChain {
@@ -17,14 +17,14 @@ class ManageCommand : UserCommand {
             when (args[0]) {
                 "save" -> {
                     BotVariables.save()
-                    return "配置保存了".toMirai()
+                    return "配置保存了".toMsgChain()
                 }
                 "userReload" -> {
                     BotUsers.loadUsers()
-                    return "用户已经重新加载".toMirai()
+                    return "用户已经重新加载".toMsgChain()
                 }
             }
-        } else return help.toMirai()
+        } else return help.toMsgChain()
         return EmptyMessageChain
     }
 

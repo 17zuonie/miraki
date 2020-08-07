@@ -2,21 +2,21 @@ package org.akteam.miraki.command.subcommand
 
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
-import org.akteam.miraki.command.CommandExecutor
 import org.akteam.miraki.command.CommandProps
 import org.akteam.miraki.command.GuestCommand
-import org.akteam.miraki.util.toMirai
+import org.akteam.miraki.command.MessageHandler
+import org.akteam.miraki.util.toMsgChain
 
 class HelpCommand : GuestCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>): MessageChain {
         val sb = StringBuilder()
-        for (cmd in CommandExecutor.commands) {
+        for (cmd in MessageHandler.getCommands()) {
             if (cmd.props.name.contentEquals("help") || !cmd.props.name.contentEquals("debug")) {
                 sb.append("-").append(cmd.props.name).append("  ").append(cmd.props.description).append("\n")
             }
         }
 
-        return sb.toString().trim().toMirai()
+        return sb.toString().trim().toMsgChain()
     }
 
     override val props = CommandProps(

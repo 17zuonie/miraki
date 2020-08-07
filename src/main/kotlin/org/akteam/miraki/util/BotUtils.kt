@@ -16,13 +16,13 @@ import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.coroutines.resumeWithException
 
-fun String.toMirai(): MessageChain {
+fun String.toMsgChain(): MessageChain {
     return toMessage().asMessageChain()
 }
 
 object BotUtils {
     fun getRunningTime(): String {
-        val remain = Duration.between(BotMain.startTime, LocalDateTime.now())
+        val remain = Duration.between(BotVariables.startTime, LocalDateTime.now())
         return "${remain.toDays()}天${remain.toHoursPart()}时${remain.toMinutesPart()}分${remain.toSecondsPart()}秒$"
     }
 

@@ -120,14 +120,14 @@ object MusicUtil {
                         """.trimIndent()
                         ).asMessageChain()
                     } else {
-                        return playUrl.toMirai()
+                        return playUrl.toMsgChain()
                     }
                 }
             }
         } catch (e: IOException) {
             BotVariables.logger.error(e)
         }
-        return "找不到歌曲".toMirai()
+        return "找不到歌曲".toMsgChain()
     }
 
 /*

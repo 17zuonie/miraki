@@ -17,7 +17,7 @@ import org.akteam.miraki.model.UserLevel
 import org.akteam.miraki.util.BotUtils
 import org.akteam.miraki.util.BotUtils.getRestString
 import org.akteam.miraki.util.MusicUtil
-import org.akteam.miraki.util.toMirai
+import org.akteam.miraki.util.toMsgChain
 import org.akteam.miraki.web.JwtConfig
 import java.time.Instant
 
@@ -26,30 +26,30 @@ class MusicCommand : UserCommand {
         return if (args.isNotEmpty()) {
             when (args[0]) {
                 "创建歌单" -> {
-                    if (user.hasPermission(UserLevel.ADMIN)) "没有权限".toMirai()
+                    if (user.hasPermission(UserLevel.ADMIN)) "没有权限".toMsgChain()
                     try {
                         val pl = Playlist {
                             startTime = Instant.now()
                             endTime = null
                         }
                         BotVariables.db.sequenceOf(Playlists).add(pl)
-                        "成功，歌单 ID 为 ${pl.n}".toMirai()
+                        "成功，歌单 ID 为 ${pl.n}".toMsgChain()
                     } catch (e: Exception) {
-                        "出现错误 ${e.message}".toMirai()
+                        "出现错误 ${e.message}".toMsgChain()
                     }
                 }
                 "终止歌单" -> {
-                    if (user.hasPermission(UserLevel.ADMIN)) "没有权限".toMirai()
+                    if (user.hasPermission(UserLevel.ADMIN)) "没有权限".toMsgChain()
                     try {
                         val pl = BotVariables.db.sequenceOf(Playlists).find { it.n eq args[1].toInt() }
-                        if (pl == null) "失败，歌单不存在".toMirai()
+                        if (pl == null) "失败，歌单不存在".toMsgChain()
                         else {
                             pl.endTime = Instant.now()
                             pl.flushChanges()
-                            "成功，歌单 ${pl.n} 已终止".toMirai()
+                            "成功，歌单 ${pl.n} 已终止".toMsgChain()
                         }
                     } catch (e: Exception) {
-                        "出现错误 ${e.message}".toMirai()
+                        "出现错误 ${e.message}".toMsgChain()
                     }
                 }
                 "投票" -> {
@@ -64,7 +64,7 @@ class MusicCommand : UserCommand {
                 else -> MusicUtil.searchNetEaseMusic(args.getRestString(1))
             }
         } else {
-            help.toMirai()
+            help.toMsgChain()
         }
     }
 

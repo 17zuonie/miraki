@@ -11,14 +11,22 @@ import okhttp3.OkHttpClient
 import org.akteam.miraki.model.Config
 import java.io.File
 import java.io.FileReader
+import java.time.LocalDateTime
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 object BotVariables {
+    const val version = "Miraki 4.0"
+
     private val cfgFile = File("config.json")
+    lateinit var cfg: Config
     lateinit var bot: Bot
     lateinit var logger: MiraiLogger
-    lateinit var cfg: Config
     lateinit var db: Database
+
+    lateinit var startTime: LocalDateTime
+    lateinit var service: ScheduledExecutorService
 
     val json = Json(
         JsonConfiguration.Stable.copy(
@@ -33,6 +41,9 @@ object BotVariables {
         .build()
 
     fun init() {
+        startTime = LocalDateTime.now()
+        service = Executors.newScheduledThreadPool(4)
+
         if (!cfgFile.exists()) {
             cfgFile.writeText(json.stringify(Config.serializer(), Config(100000L, "")))
         }

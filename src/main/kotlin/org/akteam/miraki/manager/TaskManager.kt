@@ -1,15 +1,16 @@
 package org.akteam.miraki.manager
 
 import org.akteam.miraki.BotMain
+import org.akteam.miraki.BotVariables
 import java.util.concurrent.TimeUnit
 
 object TaskManager {
     fun runAsync(task: () -> Unit, delay: Long) {
-        BotMain.service.schedule(task, delay, TimeUnit.SECONDS)
+        BotVariables.service.schedule(task, delay, TimeUnit.SECONDS)
     }
 
     fun runScheduleTaskAsync(task: () -> Unit, firstTimeDelay: Long, period: Long, unit: TimeUnit) {
-        BotMain.service.scheduleAtFixedRate(task, firstTimeDelay, period, unit)
+        BotVariables.service.scheduleAtFixedRate(task, firstTimeDelay, period, unit)
     }
 
     fun runScheduleTaskAsyncIf(task: () -> Unit, delay: Long, period: Long, unit: TimeUnit, condition: Boolean) {

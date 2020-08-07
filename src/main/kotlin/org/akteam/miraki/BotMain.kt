@@ -3,12 +3,12 @@ package org.akteam.miraki
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
-import net.mamoe.mirai.event.Listener
+import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
-import net.mamoe.mirai.message.data.EmptyMessageChain
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.utils.BotConfiguration
-import org.akteam.miraki.command.CommandExecutor
+import org.akteam.miraki.command.MessageHandler
 import org.akteam.miraki.command.subcommand.*
 import org.akteam.miraki.listener.FuckLightAppListener
 import org.akteam.miraki.listener.MListener
@@ -25,10 +25,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 object BotMain {
-    const val version = "Miraki 4.0"
-    lateinit var startTime: LocalDateTime
-    lateinit var service: ScheduledExecutorService
-
     suspend fun start(qq: Long, password: String) {
         val config = BotConfiguration.Default
         config.fileBasedDeviceInfo()
@@ -39,10 +35,9 @@ object BotMain {
         BotUsers.loadUsers()
         BotVariables.logger.info("[用户] 已加载用户")
 
-        service = Executors.newScheduledThreadPool(4)
         startUpTask()
 
-        CommandExecutor.setupCommand(
+        MessageHandler.setupCommand(
             arrayOf(
                 VersionCommand(),
                 HelpCommand(),
@@ -52,7 +47,7 @@ object BotMain {
             )
         )
 
-        BotVariables.logger.info("[命令] 已注册 " + CommandExecutor.commands.size + " 个命令")
+        BotVariables.logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个命令")
 
         val listeners: Array<MListener> = arrayOf(
             FuckLightAppListener,
@@ -66,11 +61,11 @@ object BotMain {
             BotVariables.logger.info("[监听器] 已注册 ${it.name} 监听器")
         }
 
-        BotVariables.bot.subscribeMessages(priority = Listener.EventPriority.NORMAL) {
+        BotVariables.bot.subscribeMessages {
             always {
                 if (sender.id != 80000000L) {
-                    val result = CommandExecutor.execute(this@always)
-                    if (result !is EmptyMessageChain) reply(result)
+                    if (this is GroupMessageEvent && group.isBotMuted) return@always
+                    MessageHandler.execute(this)
                 }
             }
         }
@@ -78,13 +73,13 @@ object BotMain {
         Runtime.getRuntime().addShutdownHook(Thread {
             runBlocking {
                 WebMain.server.stop(2000, 5000)
-                service.shutdown()
+                BotVariables.service.shutdown()
                 BotVariables.bot.close(null)
             }
         })
     }
 
-    fun startUpTask() {
+    private fun startUpTask() {
         TaskManager.runScheduleTaskAsync(
             ChunHuiNoticeUpdater::run,
             BotVariables.cfg.fetchNoticeDelay,
@@ -95,7 +90,6 @@ object BotMain {
 }
 
 fun main(args: Array<String>) = runBlocking<Unit> {
-    BotMain.startTime = LocalDateTime.now()
     BotVariables.init()
     BotVariables.load()
 
