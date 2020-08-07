@@ -14,18 +14,19 @@ import java.time.LocalDateTime
  * @author Nameless
  */
 object MessageHandler {
-    private var commands: List<UniversalCommand> = mutableListOf()
+    private var simpleCommands: List<SimpleCommand> = mutableListOf()
+    private var naturalCommands: List<NaturalCommand> = mutableListOf()
 
     /**
      * 注册命令
      *
      * @param command 要注册的命令
      */
-    private fun setupCommand(command: UniversalCommand) {
-        if (!commands.contains(command)) {
-            commands = commands + command
+    private fun setupSimpleCommand(command: SimpleCommand) {
+        if (!simpleCommands.contains(command)) {
+            simpleCommands = simpleCommands + command
         } else {
-            BotVariables.logger.warning("[命令] 正在尝试注册已有命令 ${command.props.name}")
+            BotVariables.logger.warning("[命令] 正在尝试注册已有简单命令 ${command.props.name}")
         }
     }
 
@@ -34,9 +35,23 @@ object MessageHandler {
      *
      * @param commands 要注册的命令集合
      */
-    fun setupCommand(commands: Array<UniversalCommand>) {
+    fun setupSimpleCommand(commands: Array<SimpleCommand>) {
         commands.forEach {
-            setupCommand(it)
+            setupSimpleCommand(it)
+        }
+    }
+
+    fun setupNaturalCommand(command: NaturalCommand) {
+        if (!naturalCommands.contains(command)) {
+            naturalCommands = naturalCommands + command
+        } else {
+            BotVariables.logger.warning("[命令] 正在尝试注册已有自然命令 ${command.name}")
+        }
+    }
+
+    fun setupNaturalCommand(commands: Array<NaturalCommand>) {
+        commands.forEach {
+            setupNaturalCommand(it)
         }
     }
 
@@ -45,7 +60,7 @@ object MessageHandler {
      *
      * @param event Mirai 消息命令 (聊天)
      */
-    suspend fun execute(event: MessageEvent) {
+    suspend fun executeSimpleCommand(event: MessageEvent) {
         val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
         val message = event.message.contentToString()
@@ -88,6 +103,36 @@ object MessageHandler {
         }
     }
 
+    // 返回值 表示是否匹配到 NaturalCommand
+    suspend fun executeNaturalCommand(event: MessageEvent): Boolean {
+        val senderId = event.sender.id
+        val user = BotUsers.get(senderId)
+
+        if (user != null) {
+            try {
+                val intents = naturalCommands
+                        .map { it.intent(event, user) }
+                        // 置信度大于 60 且用户拥有权限
+                        .filter { it.confidence >= 60 && user.hasPermission(it.advice.userLevel) }
+
+                val intent = intents.minBy { it.confidence }
+                return if (intent != null) {
+                    intent.advice.entry(event, user)
+                    true
+                } else false
+            } catch (t: Throwable) {
+                val msg = t.message
+                if (msg != null && msg.contains("time")) {
+                    event.reply("Bot > 在执行网络操作时连接超时".toMsgChain())
+                } else {
+                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: $senderId", t)
+                    event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
+                }
+            }
+        }
+        return false
+    }
+
     /*@ExperimentalTime
     private suspend fun handleSession(event: MessageEvent, time: LocalDateTime) {
         val sender = event.sender
@@ -112,8 +157,8 @@ object MessageHandler {
         )
     }*/
 
-    private fun getCommand(cmdPrefix: String): UniversalCommand? {
-        for (command in commands) {
+    private fun getCommand(cmdPrefix: String): SimpleCommand? {
+        for (command in simpleCommands) {
             if (commandEquals(command, cmdPrefix)) {
                 return command
             }
@@ -142,7 +187,7 @@ object MessageHandler {
         return false
     }
 
-    private fun commandEquals(cmd: UniversalCommand, cmdName: String): Boolean {
+    private fun commandEquals(cmd: SimpleCommand, cmdName: String): Boolean {
         val props = cmd.props
 
         // 匹配 name
@@ -159,7 +204,7 @@ object MessageHandler {
         return false
     }
 
-    fun countCommands(): Int = commands.size
+    fun countCommands(): Int = simpleCommands.size
 
-    fun getCommands() = commands
+    fun getCommands() = simpleCommands
 }

@@ -6,7 +6,7 @@ package org.akteam.miraki.command
  *
  * @author StarWishsama
  */
-interface UniversalCommand {
+interface SimpleCommand {
     /** 命令属性 */
     val props: CommandProps
 

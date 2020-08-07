@@ -18,9 +18,6 @@ import org.akteam.miraki.manager.TaskManager
 import org.akteam.miraki.model.BotUsers
 import org.akteam.miraki.tasks.ChunHuiNoticeUpdater
 import org.akteam.miraki.web.WebMain
-import java.time.LocalDateTime
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
@@ -37,7 +34,7 @@ object BotMain {
 
         startUpTask()
 
-        MessageHandler.setupCommand(
+        MessageHandler.setupSimpleCommand(
             arrayOf(
                 VersionCommand(),
                 HelpCommand(),
@@ -46,8 +43,11 @@ object BotMain {
                 ManageCommand()
             )
         )
+        BotVariables.logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个简单命令")
 
-        BotVariables.logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个命令")
+        MessageHandler.setupNaturalCommand(
+            arrayOf()
+        )
 
         val listeners: Array<MListener> = arrayOf(
             FuckLightAppListener,
@@ -65,7 +65,7 @@ object BotMain {
             always {
                 if (sender.id != 80000000L) {
                     if (this is GroupMessageEvent && group.isBotMuted) return@always
-                    MessageHandler.execute(this)
+                    MessageHandler.executeSimpleCommand(this)
                 }
             }
         }
