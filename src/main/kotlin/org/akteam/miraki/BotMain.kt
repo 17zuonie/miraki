@@ -3,10 +3,7 @@ package org.akteam.miraki
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
-import net.mamoe.mirai.contact.isBotMuted
-import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
-import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.utils.BotConfiguration
 import org.akteam.miraki.command.MessageHandler
 import org.akteam.miraki.command.subcommand.*
@@ -43,11 +40,14 @@ object BotMain {
                 ManageCommand()
             )
         )
-        BotVariables.logger.info("[命令] 已注册 " + MessageHandler.countCommands() + " 个简单命令")
+        BotVariables.logger.info("[命令] 已注册 ${MessageHandler.countSimpleCommands()} 个简单命令")
 
         MessageHandler.setupNaturalCommand(
             arrayOf()
         )
+        BotVariables.logger.info("[命令] 已注册 ${MessageHandler.countNaturalCommands()} 个自然命令")
+
+        MessageHandler.start(BotVariables.bot)
 
         val listeners: Array<MListener> = arrayOf(
             FuckLightAppListener,
@@ -59,15 +59,6 @@ object BotMain {
         listeners.forEach {
             it.register(BotVariables.bot)
             BotVariables.logger.info("[监听器] 已注册 ${it.name} 监听器")
-        }
-
-        BotVariables.bot.subscribeMessages {
-            always {
-                if (sender.id != 80000000L) {
-                    if (this is GroupMessageEvent && group.isBotMuted) return@always
-                    MessageHandler.executeSimpleCommand(this)
-                }
-            }
         }
 
         Runtime.getRuntime().addShutdownHook(Thread {

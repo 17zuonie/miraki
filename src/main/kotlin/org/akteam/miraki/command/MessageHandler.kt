@@ -1,8 +1,14 @@
 package org.akteam.miraki.command
 
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.contact.isBotMuted
+import net.mamoe.mirai.event.subscribeMessages
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import org.akteam.miraki.BotVariables
+import org.akteam.miraki.manager.SessionManager
+import org.akteam.miraki.model.BotUser
 import org.akteam.miraki.model.BotUsers
 import org.akteam.miraki.util.toMsgChain
 import java.time.Duration
@@ -55,12 +61,28 @@ object MessageHandler {
         }
     }
 
+    fun start(bot: Bot) {
+        bot.subscribeMessages {
+            always {
+                if (sender.id != 80000000L) {
+                    if (this is GroupMessageEvent && group.isBotMuted) return@always
+                    val senderId = sender.id
+                    val user = BotUsers.get(senderId)
+
+                    if (SessionManager.executeSession(this, user)) return@always
+                    if (executeNaturalCommand(this, user)) return@always
+                    executeSimpleCommand(this, user)
+                }
+            }
+        }
+    }
+
     /**
      * 执行消息中的命令
      *
      * @param event Mirai 消息命令 (聊天)
      */
-    suspend fun executeSimpleCommand(event: MessageEvent) {
+    suspend fun executeSimpleCommand(event: MessageEvent, user: BotUser?) {
         val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
         val message = event.message.contentToString()
@@ -75,9 +97,8 @@ object MessageHandler {
                     // 无需认证
                     if (cmd is GuestCommand) {
                         cmd.execute(event, splitMessage.subList(1, splitMessage.size))
-                    } else if (cmd is UserCommand) {
+                    } else if (cmd is UserCommand && user != null) {
                         // 需要认证
-                        val user = BotUsers.get(senderId) ?: return
                         val result: MessageChain =
                             if (user.hasPermission(cmd.level)) {
                                 cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
@@ -104,10 +125,7 @@ object MessageHandler {
     }
 
     // 返回值 表示是否匹配到 NaturalCommand
-    suspend fun executeNaturalCommand(event: MessageEvent): Boolean {
-        val senderId = event.sender.id
-        val user = BotUsers.get(senderId)
-
+    suspend fun executeNaturalCommand(event: MessageEvent, user: BotUser?): Boolean {
         if (user != null) {
             try {
                 val intents = naturalCommands
@@ -125,7 +143,7 @@ object MessageHandler {
                 if (msg != null && msg.contains("time")) {
                     event.reply("Bot > 在执行网络操作时连接超时".toMsgChain())
                 } else {
-                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: $senderId", t)
+                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}", t)
                     event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
                 }
             }
@@ -204,7 +222,11 @@ object MessageHandler {
         return false
     }
 
-    fun countCommands(): Int = simpleCommands.size
+    fun countSimpleCommands(): Int = simpleCommands.size
 
-    fun getCommands() = simpleCommands
+    fun countNaturalCommands(): Int = naturalCommands.size
+
+    fun getSimpleCommands() = simpleCommands
+
+    fun getNaturalCommands() = naturalCommands
 }

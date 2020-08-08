@@ -10,7 +10,7 @@ import org.akteam.miraki.util.toMsgChain
 class HelpCommand : GuestCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>): MessageChain {
         val sb = StringBuilder()
-        for (cmd in MessageHandler.getCommands()) {
+        for (cmd in MessageHandler.getSimpleCommands()) {
             if (cmd.props.name.contentEquals("help") || !cmd.props.name.contentEquals("debug")) {
                 sb.append("-").append(cmd.props.name).append("  ").append(cmd.props.description).append("\n")
             }

@@ -12,7 +12,7 @@ import org.akteam.miraki.util.toMsgChain
 class VersionCommand : GuestCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>): MessageChain {
         return ("Miraki " + BotVariables.version +
-                "\n已注册命令数: " + MessageHandler.countCommands() +
+                "\n已注册命令数: " + MessageHandler.countSimpleCommands() +
                 "\n运行时长 ${BotUtils.getRunningTime()}" +
                 "\nMade with ❤ & Mirai 1.1.3").toMsgChain()
     }

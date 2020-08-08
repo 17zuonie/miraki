@@ -19,6 +19,7 @@ data class Config(
     val jwtSecret = randomUUID()!!.toString() // 随机一个 secret 不一定要是 UUID
     val httpApiUrl = "http://localhost:8080/"
     val fetchNoticeDelay = 60L
+    val sessionExpireTime = 15 * 60L
 
     val commandPrefix = listOf("-", ".", "!", "#", "/")
 }
