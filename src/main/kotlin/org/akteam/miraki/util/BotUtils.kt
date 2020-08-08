@@ -4,10 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import net.mamoe.mirai.message.data.LightApp
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.asMessageChain
-import net.mamoe.mirai.message.data.toMessage
+import net.mamoe.mirai.message.data.*
 import okhttp3.*
 import org.akteam.miraki.BotMain
 import org.akteam.miraki.BotVariables
@@ -38,7 +35,7 @@ object BotUtils {
         return sb.toString().trim()
     }
 
-    fun sendLinkCard(
+    fun makeLinkCard(
         title: String,
         desc: String,
         jumpUrl: String,

@@ -5,5 +5,5 @@ import net.mamoe.mirai.message.data.MessageChain
 
 interface GuestCommand : SimpleCommand {
     /** 执行命令后的逻辑 */
-    suspend fun execute(event: MessageEvent, args: List<String>): MessageChain
+    suspend fun execute(event: MessageEvent, args: List<String>)
 }

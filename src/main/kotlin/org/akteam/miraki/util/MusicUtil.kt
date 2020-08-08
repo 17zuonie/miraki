@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.content
 import kotlinx.serialization.json.int
 import net.mamoe.mirai.message.data.LightApp
+import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import okhttp3.OkHttpClient
@@ -21,7 +22,7 @@ object MusicUtil {
     private val client = OkHttpClient()
     private val json = Json(JsonConfiguration.Stable)
 
-    suspend fun searchNetEaseMusic(songName: String, directLink: Boolean = false): MessageChain {
+    suspend fun searchNetEaseMusic(songName: String, directLink: Boolean = false): Message {
         try {
             BotVariables.logger.debug(
                 "http://${BotVariables.cfg.netEaseApi}/search?keywords=${
