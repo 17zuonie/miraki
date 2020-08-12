@@ -70,8 +70,8 @@ object MessageHandler {
                     val user = BotUsers.get(senderId)
 
                     if (SessionManager.executeSession(this, user)) return@always
-                    if (executeNaturalCommand(this, user)) return@always
-                    executeSimpleCommand(this, user)
+                    if (executeSimpleCommand(this, user)) return@always
+                    executeNaturalCommand(this, user)
                 }
             }
         }
@@ -82,7 +82,7 @@ object MessageHandler {
      *
      * @param event Mirai 消息命令 (聊天)
      */
-    suspend fun executeSimpleCommand(event: MessageEvent, user: BotUser?) {
+    private suspend fun executeSimpleCommand(event: MessageEvent, user: BotUser?): Boolean {
         val executedTime = LocalDateTime.now()
         val senderId = event.sender.id
         val message = event.message.contentToString()
@@ -97,6 +97,7 @@ object MessageHandler {
                     // 无需认证
                     if (cmd is GuestCommand) {
                         cmd.execute(event, splitMessage.subList(1, splitMessage.size))
+                        return true
                     } else if (cmd is UserCommand && user != null) {
                         // 需要认证
                         val result: MessageChain =
@@ -110,6 +111,7 @@ object MessageHandler {
                         BotVariables.logger.debug(
                             "[命令] 命令执行耗时 ${usedTime.toMillis()}ms"
                         )
+                        return true
                     }
                 }
             }
@@ -122,10 +124,11 @@ object MessageHandler {
                 event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
             }
         }
+        return false
     }
 
     // 返回值 表示是否匹配到 NaturalCommand
-    suspend fun executeNaturalCommand(event: MessageEvent, user: BotUser?): Boolean {
+    private suspend fun executeNaturalCommand(event: MessageEvent, user: BotUser?): Boolean {
         if (user != null) {
             try {
                 val intents = naturalCommands
