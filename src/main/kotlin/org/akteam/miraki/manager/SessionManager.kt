@@ -34,10 +34,10 @@ object SessionManager {
         val session = when(event) {
             is GroupMessageEvent -> {
                 val groupId = event.group.id
-                groupSessions[Pair(groupId, senderId)]
+                groupSessions.remove(Pair(groupId, senderId))
             }
             is FriendMessageEvent -> {
-                sessions[senderId]
+                sessions.remove(senderId)
             }
             else -> {
                 null
