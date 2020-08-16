@@ -33,7 +33,7 @@ object BotMain {
 
         MessageHandler.setupSimpleCommand(
             arrayOf(
-                VersionCommand(),
+                    VersionCommand(),
                 HelpCommand(),
                 MusicCommand(),
                 NoticeCommand(),
@@ -43,7 +43,7 @@ object BotMain {
         BotVariables.logger.info("[命令] 已注册 ${MessageHandler.countSimpleCommands()} 个简单命令")
 
         MessageHandler.setupNaturalCommand(
-            arrayOf()
+            GuessNumberCommand()
         )
         BotVariables.logger.info("[命令] 已注册 ${MessageHandler.countNaturalCommands()} 个自然命令")
 

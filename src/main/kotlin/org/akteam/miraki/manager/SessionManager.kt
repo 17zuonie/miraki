@@ -4,72 +4,60 @@ import net.mamoe.mirai.message.FriendMessageEvent
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
 import org.akteam.miraki.model.BotUser
-import org.akteam.miraki.model.GroupSession
 import org.akteam.miraki.model.Session
 import java.time.Instant
 
 object SessionManager {
     private val sessions: MutableMap<Long, Session> = mutableMapOf()
     // Pair<groupId, senderId>
-    private val groupSessions: MutableMap<Pair<Long, Long>, GroupSession> = mutableMapOf()
+    private val groupSessions: MutableMap<Pair<Long, Long>, Session> = mutableMapOf()
 
-    private fun maintain(groupId: Long, senderId: Long): GroupSession? {
-        val session = groupSessions[Pair(groupId, senderId)]
-        return if (session != null) {
-            if (session.expireTime < Instant.now()) {
+    fun remove(event: MessageEvent): Session? {
+        val senderId = event.sender.id
+        return when(event) {
+            is GroupMessageEvent -> {
+                val groupId = event.group.id
                 groupSessions.remove(Pair(groupId, senderId))
-                null
-            } else {
-                session
             }
-        } else null
-    }
-
-    private fun maintain(senderId: Long): Session? {
-        val session = sessions[senderId]
-        return if (session != null) {
-            if (session.expireTime < Instant.now()) {
+            is FriendMessageEvent -> {
                 sessions.remove(senderId)
-                null
-            } else {
-                session
             }
-        } else null
+            else -> {
+                null
+            }
+        }
     }
 
     fun executeSession(event: MessageEvent, user: BotUser?): Boolean {
         if (user == null) return false
         val senderId = event.sender.id
-        when(event) {
+        val session = when(event) {
             is GroupMessageEvent -> {
                 val groupId = event.group.id
-                val session = maintain(groupId, senderId)
-                if (session != null) session.handler(event, user)
-                else return false
-                return true
+                groupSessions.remove(Pair(groupId, senderId))
             }
             is FriendMessageEvent -> {
-                val session = maintain(senderId)
-                if (session != null) session.handler(event, user)
-                else return false
-                return true
+                sessions.remove(senderId)
             }
             else -> {
-                return false
+                null
             }
         }
+        if (session != null) session.handler(event)
+        else return false
+        return true
     }
 
-    fun set(event: MessageEvent, expireTime: Instant, handler: (MessageEvent, BotUser) -> Unit) {
+    fun set(event: MessageEvent, expireTime: Instant, handler: (MessageEvent) -> Unit) {
         val senderId = event.sender.id
         when(event) {
             is FriendMessageEvent -> {
-                val session = Session(senderId, expireTime, handler)
+                val session = Session(senderId, null, expireTime, handler)
                 sessions[senderId] = session
             }
             is GroupMessageEvent -> {
                 val groupId = event.group.id
-                val session = GroupSession(senderId, groupId, expireTime, handler)
+                val session = Session(senderId, groupId, expireTime, handler)
                 groupSessions[Pair(groupId, senderId)] = session
             }
         }
