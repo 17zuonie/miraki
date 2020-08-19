@@ -1,37 +1,35 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.3.70"
-    kotlin("plugin.serialization") version "1.3.70"
+    kotlin("jvm") version "1.4.0"
+    kotlin("plugin.serialization") version "1.4.0"
     id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 group = "org.akteam"
 version = "4.0-SNAPSHOT"
 
 repositories {
-    mavenLocal()
-    maven {
-        url = uri("https://maven.aliyun.com/repository/public")
-    }
+//    mavenLocal()
+    maven(url = "https://maven.aliyun.com/repository/public")
+    maven(url = "https://dl.bintray.com/kotlin/kotlin-eap")
+    maven(url = "https://kotlin.bintray.com/kotlinx")
     mavenCentral()
-    maven {
-        url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
-    }
 }
 
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
 object Versions {
-    const val mirai = "1.1.3"
+    const val mirai = "1.2.0"
 
     object Kotlin {
-        const val stdlib = "1.3.70"
-        const val coroutines = "1.3.7"
-        const val atomicFU = "0.14.2"
-        const val serialization = "0.20.0"
-        const val ktor = "1.3.2"
+        const val compiler = "1.4.0"
+        const val stdlib = "1.4.0"
+        const val coroutines = "1.3.9"
+        const val atomicFU = "0.14.4"
+        const val serialization = "1.0.0-RC"
+        const val ktor = "1.3.2-1.4.0-rc"
         const val binaryValidator = "0.2.3"
 
         const val io = "0.1.16"
@@ -48,7 +46,7 @@ dependencies {
     implementation(mirai("core"))
     implementation(mirai("core-qqandroid"))
 
-    implementation(kotlinx("serialization-runtime", Versions.Kotlin.serialization))
+    implementation(kotlinx("serialization-core", Versions.Kotlin.serialization))
 
     implementation(ktor("server-core"))
     implementation(ktor("server-netty"))
@@ -69,7 +67,9 @@ tasks {
     shadowJar {
 //        minimize()
         manifest {
-            attributes(mapOf("Main-Class" to "org.akteam.miraki.BotMainKt"))
+            attributes(
+                "Main-Class" to "org.akteam.miraki.BotMainKt"
+            )
         }
     }
 }

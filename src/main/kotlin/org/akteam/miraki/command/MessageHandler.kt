@@ -1,11 +1,11 @@
 package org.akteam.miraki.command
 
+import kotlinx.coroutines.TimeoutCancellationException
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.isBotMuted
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.MessageEvent
-import net.mamoe.mirai.message.data.MessageChain
 import org.akteam.miraki.BotVariables
 import org.akteam.miraki.manager.SessionManager
 import org.akteam.miraki.model.BotUser
@@ -134,17 +134,23 @@ object MessageHandler {
                         // 置信度大于 60 且用户拥有权限
                         .filter { it.confidence >= 60 && user.hasPermission(it.advice.userLevel) }
 
-                val intent = intents.minBy { it.confidence }
+                val intent = intents.minByOrNull { it.confidence }
                 return if (intent != null) {
                     intent.advice.entry(event, user)
                     true
                 } else false
             } catch (t: Throwable) {
+                if (t is TimeoutCancellationException) {
+                    event.reply("这么久不理我，我去休息了")
+                }
                 val msg = t.message
                 if (msg != null && msg.contains("time")) {
                     event.reply("Bot > 在执行网络操作时连接超时".toMsgChain())
                 } else {
-                    BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}", t)
+                    BotVariables.logger.warning(
+                        "[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}",
+                        t
+                    )
                     event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
                 }
             }

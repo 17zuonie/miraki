@@ -2,7 +2,6 @@ package org.akteam.miraki
 
 import com.impossibl.postgres.jdbc.PGDataSource
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.support.postgresql.PostgreSqlDialect
 import net.mamoe.mirai.Bot
@@ -28,11 +27,9 @@ object BotVariables {
     lateinit var startTime: LocalDateTime
     lateinit var service: ScheduledExecutorService
 
-    val json = Json(
-        JsonConfiguration.Stable.copy(
-            prettyPrint = true
-        )
-    )
+    val json = Json {
+        prettyPrint = true
+    }
 
     val http = OkHttpClient().newBuilder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -45,12 +42,12 @@ object BotVariables {
         service = Executors.newScheduledThreadPool(4)
 
         if (!cfgFile.exists()) {
-            cfgFile.writeText(json.stringify(Config.serializer(), Config(100000L, "")))
+            cfgFile.writeText(json.encodeToString(Config.serializer(), Config(100000L, "")))
         }
     }
 
     fun load() {
-        cfg = json.parse(Config.serializer(), FileReader(cfgFile).readText())
+        cfg = json.decodeFromString(Config.serializer(), FileReader(cfgFile).readText())
         val ds = PGDataSource()
         ds.databaseUrl = cfg.databaseUrl
         ds.user = cfg.databaseUser
@@ -59,6 +56,6 @@ object BotVariables {
     }
 
     fun save() {
-        cfgFile.writeText(json.stringify(Config.serializer(), cfg))
+        cfgFile.writeText(json.encodeToString(Config.serializer(), cfg))
     }
 }

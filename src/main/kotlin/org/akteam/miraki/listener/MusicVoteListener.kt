@@ -1,7 +1,8 @@
 package org.akteam.miraki.listener
 
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.content
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import me.liuwj.ktorm.dsl.*
 import me.liuwj.ktorm.entity.add
 import me.liuwj.ktorm.entity.filter
@@ -24,7 +25,7 @@ object MusicVoteListener : MListener {
             always {
                 val card = message[LightApp]
                 if (card != null) {
-                    val jsonObject = BotVariables.json.parseJson(card.content).jsonObject
+                    val jsonObject = BotVariables.json.parseToJsonElement(card.content).jsonObject
                     val meta = jsonObject["meta"]!!.jsonObject
                     val music = meta["music"]
                     if (music != null && music is JsonObject) {
@@ -46,13 +47,13 @@ object MusicVoteListener : MListener {
                             playlistId = playlist.n
                             confirmed = false
 
-                            title = music["title"]!!.content
-                            artist = music["desc"]!!.content
-                            platform = music["tag"]!!.content
+                            title = music["title"]!!.jsonPrimitive.content
+                            artist = music["desc"]!!.jsonPrimitive.content
+                            platform = music["tag"]!!.jsonPrimitive.content
 
-                            jumpUrl = music["jumpUrl"]!!.content
-                            musicUrl = music["musicUrl"]!!.content
-                            previewUrl = music["preview"]!!.content
+                            jumpUrl = music["jumpUrl"]!!.jsonPrimitive.content
+                            musicUrl = music["musicUrl"]!!.jsonPrimitive.content
+                            previewUrl = music["preview"]!!.jsonPrimitive.content
                         }
                         val seq = BotVariables.db.sequenceOf(RecommendMusics)
                         for (m in seq) {

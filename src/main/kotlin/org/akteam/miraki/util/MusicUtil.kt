@@ -1,12 +1,8 @@
 package org.akteam.miraki.util
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.json.content
-import kotlinx.serialization.json.int
+import kotlinx.serialization.json.*
 import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.Message
-import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.asMessageChain
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -20,7 +16,7 @@ object MusicUtil {
     /** 1分钟100次，10分钟500次，1小时2000次 */
     private const val thirdPartyApi = "https://api.qq.jsososo.com/song/urls?id="
     private val client = OkHttpClient()
-    private val json = Json(JsonConfiguration.Stable)
+    private val json = Json { allowStructuredMapKeys = true }
 
     suspend fun searchNetEaseMusic(songName: String, directLink: Boolean = false): Message {
         try {
@@ -41,33 +37,33 @@ object MusicUtil {
                 }"
             )
             if (rep.isSuccessful) {
-                val searchResult = json.parseJson(rep.readText()).jsonObject
-                val musicId = searchResult
-                    .getObject("result")
-                    .getArray("songs")[0]
+                val searchResult = json.parseToJsonElement(rep.readText()).jsonObject
+                val musicId = searchResult["result"]!!
+                    .jsonObject["songs"]!!
+                    .jsonArray[0]
                     .jsonObject["id"]!!
-                    .int
+                    .jsonPrimitive.int
                 val musicUrl = "https://music.163.com/#/song?id=$musicId"
                 val songResult = client.get("http://${BotVariables.cfg.netEaseApi}/song/detail?ids=$musicId").readText()
 
                 BotVariables.logger.debug("http://${BotVariables.cfg.netEaseApi}/song/detail?ids=$musicId")
 
-                val songJson = json.parseJson(songResult)
+                val songJson = json.parseToJsonElement(songResult)
                 val albumUrl = songJson
                     .jsonObject["songs"]!!
                     .jsonArray[0]
                     .jsonObject["al"]!!
                     .jsonObject["picUrl"]!!
-                    .content
+                    .jsonPrimitive.content
                 val name = songJson
                     .jsonObject["songs"]!!
                     .jsonArray[0]
                     .jsonObject["name"]!!
-                    .content
+                    .jsonPrimitive.content
                 var artistName = ""
 
                 songJson.jsonObject["songs"]!!.jsonArray[0].jsonObject["ar"]!!.jsonArray.forEach {
-                    artistName += (it.jsonObject["name"]!!.content + "/")
+                    artistName += (it.jsonObject["name"]!!.jsonPrimitive.content + "/")
                 }
 
                 artistName = artistName.substring(0, artistName.length - 1)
@@ -85,11 +81,11 @@ object MusicUtil {
                 }
 
                 if (playResult.isSuccessful) {
-                    val playJson = json.parseJson(playResult.readText()).jsonObject
+                    val playJson = json.parseToJsonElement(playResult.readText()).jsonObject
                     val playUrl = playJson["data"]!!
                         .jsonArray[0]
                         .jsonObject["url"]!!
-                        .content
+                        .jsonPrimitive.content
 
                     return if (!directLink) {
                         LightApp(
