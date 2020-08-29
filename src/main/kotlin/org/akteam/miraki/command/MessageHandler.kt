@@ -140,18 +140,17 @@ object MessageHandler {
                     true
                 } else false
             } catch (t: Throwable) {
-                if (t is TimeoutCancellationException) {
-                    event.reply("这么久不理我，我去休息了")
-                }
-                val msg = t.message
-                if (msg != null && msg.contains("time")) {
-                    event.reply("Bot > 在执行网络操作时连接超时".toMsgChain())
-                } else {
-                    BotVariables.logger.warning(
-                        "[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}",
-                        t
-                    )
-                    event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
+                when (t) {
+                    is TimeoutCancellationException -> {
+                        event.reply("这么久不理我，我去休息了")
+                    }
+                    else -> {
+                        BotVariables.logger.warning(
+                                "[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}",
+                                t
+                        )
+                        event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
+                    }
                 }
             }
         }
