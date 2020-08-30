@@ -9,16 +9,18 @@ import org.akteam.miraki.util.BotUtils
 
 class VersionCommand : GuestCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>) {
-        event.reply(("Miraki " + BotVariables.version +
-                "\n已注册命令数: " + MessageHandler.countSimpleCommands() +
-                "\n运行时长 ${BotUtils.getRunningTime()}" +
-                "\nMade with ❤ & Mirai 1.1.3"))
+        event.reply(
+            ("Miraki " + BotVariables.version +
+                    "\n已注册命令数: " + MessageHandler.countSimpleCommands() +
+                    "\n运行时长 ${BotUtils.getRunningTime()}" +
+                    "\nMade with ❤ & Mirai 1.1.3")
+        )
     }
 
     override val props = CommandProps(
-            "version",
-            arrayListOf("v", "版本"),
-            "查看版本号"
+        "version",
+        arrayListOf("v", "版本"),
+        "查看版本号"
     )
 
     override val help = ""

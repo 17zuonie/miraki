@@ -18,9 +18,9 @@ class HelpCommand : GuestCommand {
     }
 
     override val props = CommandProps(
-            "help",
-            arrayListOf("?", "帮助", "菜单"),
-            "帮助命令"
+        "help",
+        arrayListOf("?", "帮助", "菜单"),
+        "帮助命令"
     )
 
     // 它自己就是帮助命令 不需要再帮了

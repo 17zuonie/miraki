@@ -5,11 +5,13 @@ import com.google.zxing.LuminanceSource
 import com.google.zxing.NotFoundException
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource
 import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.qrcode.decoder.Decoder
 import com.google.zxing.qrcode.detector.Detector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.queryUrl
 import okhttp3.OkHttpClient
 import org.akteam.miraki.command.Intent
@@ -25,7 +27,18 @@ class QRCodeCommand : NaturalCommand {
     private val client = OkHttpClient()
 
     override suspend fun entry(event: MessageEvent, user: BotUser) {
-        TODO("Not yet implemented")
+        val img = event.message[Image]!!
+        val imgUrl = img.queryUrl()
+        val rep = client.get(imgUrl)
+        if (rep.isSuccessful && rep.body != null) {
+            val bitmap = withContext(Dispatchers.IO) {
+                val image: BufferedImage = ImageIO.read(rep.body!!.byteStream())
+                val source: LuminanceSource = BufferedImageLuminanceSource(image)
+                BinaryBitmap(HybridBinarizer(source))
+            }
+            val result = Decoder().decode(bitmap.blackMatrix)
+            event.reply(PlainText(result.text))
+        }
     }
 
     override suspend fun intent(event: MessageEvent, user: BotUser): Intent {
@@ -51,5 +64,5 @@ class QRCodeCommand : NaturalCommand {
     }
 
     override val name: String = "扫码"
-    override val userLevel: UserLevel = UserLevel.GUEST
+    override val userLevel: UserLevel = UserLevel.NORMAL
 }

@@ -15,19 +15,19 @@ object JwtConfig {
     private val algorithm = Algorithm.HMAC256(secret)
 
     val verifier: JWTVerifier = JWT
-            .require(algorithm)
-            .withIssuer(issuer)
-            .withAudience(audience)
-            .acceptExpiresAt(3)
-            .build()
+        .require(algorithm)
+        .withIssuer(issuer)
+        .withAudience(audience)
+        .acceptExpiresAt(3)
+        .build()
 
     fun makeToken(user: BotUser): String = JWT.create()
-            .withSubject("Authentication")
-            .withIssuer(issuer)
-            .withAudience(audience)
-            .withClaim("qq", user.qq)
-            .withExpiresAt(getExpiration())
-            .sign(algorithm)
+        .withSubject("Authentication")
+        .withIssuer(issuer)
+        .withAudience(audience)
+        .withClaim("qq", user.qq)
+        .withExpiresAt(getExpiration())
+        .sign(algorithm)
 
     private fun getExpiration() = Date(System.currentTimeMillis() + 15 * 60 * 1000)
 }

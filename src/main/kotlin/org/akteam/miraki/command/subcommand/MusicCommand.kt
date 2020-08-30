@@ -52,12 +52,14 @@ class MusicCommand : UserCommand {
                 }
                 "投票" -> {
                     // 群成员非好友时会发送临时会话
-                    event.sender.sendMessage(BotUtils.makeLinkCard(
+                    event.sender.sendMessage(
+                        BotUtils.makeLinkCard(
                             "专属午休歌投票通道",
                             "有效期十五分钟，请不要泄漏给别人哦",
                             "${BotVariables.cfg.httpApiUrl}#/auth/${JwtConfig.makeToken(user)}",
                             "[链接]午休歌投票"
-                    ))
+                        )
+                    )
                     PlainText("链接私戳你了，注意查收哦")
                 }
                 "下载" -> MusicUtil.searchNetEaseMusic(args.getRestString(1), directLink = true)
@@ -69,7 +71,7 @@ class MusicCommand : UserCommand {
     }
 
     override val props =
-            CommandProps("music", arrayListOf("dg", "点歌", "歌"), "点歌命令")
+        CommandProps("music", arrayListOf("dg", "点歌", "歌"), "点歌命令")
 
     override val level: UserLevel = UserLevel.NORMAL
 

@@ -107,7 +107,7 @@ object MessageHandler {
                         }
                         val usedTime = Duration.between(executedTime, LocalDateTime.now())
                         BotVariables.logger.debug(
-                                "[命令] 命令执行耗时 ${usedTime.toMillis()}ms"
+                            "[命令] 命令执行耗时 ${usedTime.toMillis()}ms"
                         )
                         return true
                     }
@@ -146,8 +146,8 @@ object MessageHandler {
                     }
                     else -> {
                         BotVariables.logger.warning(
-                                "[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}",
-                                t
+                            "[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}",
+                            t
                         )
                         event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
                     }

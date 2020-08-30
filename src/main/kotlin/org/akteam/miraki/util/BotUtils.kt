@@ -38,14 +38,14 @@ object BotUtils {
     }
 
     fun makeLinkCard(
-            title: String,
-            desc: String,
-            jumpUrl: String,
-            prompt: String = "[分享]一条链接",
-            preview: String = BotVariables.bot.selfQQ.avatarUrl,
-            tag: String = "Aki"
+        title: String,
+        desc: String,
+        jumpUrl: String,
+        prompt: String = "[分享]一条链接",
+        preview: String = BotVariables.bot.selfQQ.avatarUrl,
+        tag: String = "Aki"
     ) = LightApp(
-            """
+        """
             {
                 "app": "com.tencent.structmsg",
                 "desc": "新闻",
@@ -110,8 +110,8 @@ object BotUtils {
 
     suspend fun OkHttpClient.get(url: String): Response {
         val req = Request.Builder()
-                .url(url)
-                .build()
+            .url(url)
+            .build()
         return withContext(Dispatchers.IO) { newCall(req).await() }
     }
 

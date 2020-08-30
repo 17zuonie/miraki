@@ -25,7 +25,7 @@ class ManageCommand : UserCommand {
     }
 
     override val props =
-            CommandProps("manage", null, "配置")
+        CommandProps("manage", null, "配置")
 
     override val level: UserLevel = UserLevel.ADMIN
 

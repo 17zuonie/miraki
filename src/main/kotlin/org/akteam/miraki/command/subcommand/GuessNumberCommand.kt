@@ -39,11 +39,11 @@ class GuessNumberCommand : NaturalCommand {
 
     override suspend fun intent(event: MessageEvent, user: BotUser): Intent {
         if (event.message.contentEquals("猜数字")) return Intent(
-                confidence = 100,
-                advice = this
+            confidence = 100,
+            advice = this
         ) else return Intent(
-                confidence = 0,
-                advice = this
+            confidence = 0,
+            advice = this
         )
     }
 

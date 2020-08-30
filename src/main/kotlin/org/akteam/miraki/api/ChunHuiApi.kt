@@ -13,9 +13,9 @@ object ChunHuiApi {
         val row = doc.selectFirst(".school-notice .row")
 
         return ChunHuiNotice(
-                relativeDate = row.selectFirst(".noticeDateBlock > div:nth-child(1)").text(),
-                date = row.selectFirst(".noticeDateBlock > div:nth-child(2)").text(),
-                titleWithAuthor = row.selectFirst("div.NoticeTitle > span").text()
+            relativeDate = row.selectFirst(".noticeDateBlock > div:nth-child(1)").text(),
+            date = row.selectFirst(".noticeDateBlock > div:nth-child(2)").text(),
+            titleWithAuthor = row.selectFirst("div.NoticeTitle > span").text()
         )
 //            return mapOf(
 //                "relativeDate" to relativeDate,

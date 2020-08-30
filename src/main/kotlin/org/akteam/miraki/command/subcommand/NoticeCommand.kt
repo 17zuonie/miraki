@@ -11,33 +11,35 @@ import org.akteam.miraki.tasks.ChunHuiNoticeUpdater
 
 class NoticeCommand : UserCommand {
     override suspend fun execute(event: MessageEvent, args: List<String>, user: BotUser) {
-        event.reply(if (args.isEmpty()) {
-            val notice = ChunHuiApi.fetchNotice()
-            "校园公告@春晖：\n${notice.titleWithAuthor}\n\t${notice.date} | ${notice.relativeDate}"
-        } else {
-            when (args[0]) {
-                "订阅" -> {
-                    user.subChunHuiNotice = !user.subChunHuiNotice
-                    val ret = if (user.subChunHuiNotice) {
-                        "现在你订阅了春晖网通知"
-                    } else {
-                        "现在你不再订阅春晖网通知了"
-                    }
-                    user.flushChanges()
+        event.reply(
+            if (args.isEmpty()) {
+                val notice = ChunHuiApi.fetchNotice()
+                "校园公告@春晖：\n${notice.titleWithAuthor}\n\t${notice.date} | ${notice.relativeDate}"
+            } else {
+                when (args[0]) {
+                    "订阅" -> {
+                        user.subChunHuiNotice = !user.subChunHuiNotice
+                        val ret = if (user.subChunHuiNotice) {
+                            "现在你订阅了春晖网通知"
+                        } else {
+                            "现在你不再订阅春晖网通知了"
+                        }
+                        user.flushChanges()
 
-                    ret
+                        ret
+                    }
+                    "clear" -> {
+                        ChunHuiNoticeUpdater.latestNotice = ChunHuiNotice("", "", "")
+                        "Notice 缓存已经清空"
+                    }
+                    else -> help
                 }
-                "clear" -> {
-                    ChunHuiNoticeUpdater.latestNotice = ChunHuiNotice("", "", "")
-                    "Notice 缓存已经清空"
-                }
-                else -> help
             }
-        })
+        )
     }
 
     override val props =
-            CommandProps("notice", arrayListOf("通知", "公告"), "获取春晖网通知")
+        CommandProps("notice", arrayListOf("通知", "公告"), "获取春晖网通知")
 
     override val level: UserLevel = UserLevel.NORMAL
 
