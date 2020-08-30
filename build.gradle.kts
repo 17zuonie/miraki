@@ -57,6 +57,9 @@ dependencies {
 
     implementation("com.squareup.okhttp3", "okhttp", "4.7.2")
     implementation("org.jsoup", "jsoup", "1.13.1")
+
+    implementation("com.google.zxing:core:3.4.0")
+    implementation("com.google.zxing:javase:3.4.0")
 }
 
 tasks {
