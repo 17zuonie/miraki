@@ -1,6 +1,5 @@
 package org.akteam.miraki.manager
 
-import org.akteam.miraki.BotMain
 import org.akteam.miraki.BotVariables
 import java.util.concurrent.TimeUnit
 

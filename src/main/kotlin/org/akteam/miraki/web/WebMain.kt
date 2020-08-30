@@ -50,10 +50,10 @@ fun Application.main() {
                 val seq = BotVariables.db.sequenceOf(RecommendMusics)
 
                 val list = seq
-                    .map {
-                        val friend = BotVariables.bot.friends[it.qq]
-                        Response.Song(it, friend)
-                    }
+                        .map {
+                            val friend = BotVariables.bot.friends[it.qq]
+                            Response.Song(it, friend)
+                        }
                 call.respond(list)
             }
         }
@@ -65,9 +65,9 @@ fun Application.main() {
         authenticate {
             get("/auth/info") {
                 val rep = Response.AuthInfo(
-                    valid = true,
-                    qq = call.jwt()!!.payload.getClaim("qq").asLong(),
-                    expireAt = call.jwt()!!.payload.expiresAt.time
+                        valid = true,
+                        qq = call.jwt()!!.payload.getClaim("qq").asLong(),
+                        expireAt = call.jwt()!!.payload.expiresAt.time
                 )
                 call.respond(rep)
             }

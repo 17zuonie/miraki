@@ -6,7 +6,6 @@ import me.liuwj.ktorm.entity.find
 import me.liuwj.ktorm.entity.sequenceOf
 import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.toMessage
 import org.akteam.miraki.BotVariables
 import org.akteam.miraki.command.CommandProps
 import org.akteam.miraki.command.UserCommand

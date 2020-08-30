@@ -28,7 +28,7 @@ object ChunHuiNoticeUpdater : Runnable {
                         val f = BotVariables.bot.getFriendOrNull(it.qq)
                         f?.run {
                             sendMessage(
-                                """
+                                    """
                                 校园公告@春晖：
                                 ${newNotice.titleWithAuthor}
                                 ${newNotice.date} | ${newNotice.relativeDate}

@@ -4,9 +4,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.LightApp
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.asMessageChain
 import okhttp3.*
-import org.akteam.miraki.BotMain
 import org.akteam.miraki.BotVariables
 import java.io.IOException
 import java.time.Duration
@@ -14,7 +16,7 @@ import java.time.LocalDateTime
 import kotlin.coroutines.resumeWithException
 
 fun String.toMsgChain(): MessageChain {
-    return toMessage().asMessageChain()
+    return PlainText(this).asMessageChain()
 }
 
 object BotUtils {
@@ -36,14 +38,14 @@ object BotUtils {
     }
 
     fun makeLinkCard(
-        title: String,
-        desc: String,
-        jumpUrl: String,
-        prompt: String = "[分享]一条链接",
-        preview: String = BotVariables.bot.selfQQ.avatarUrl,
-        tag: String = "Aki"
+            title: String,
+            desc: String,
+            jumpUrl: String,
+            prompt: String = "[分享]一条链接",
+            preview: String = BotVariables.bot.selfQQ.avatarUrl,
+            tag: String = "Aki"
     ) = LightApp(
-        """
+            """
             {
                 "app": "com.tencent.structmsg",
                 "desc": "新闻",
@@ -108,8 +110,8 @@ object BotUtils {
 
     suspend fun OkHttpClient.get(url: String): Response {
         val req = Request.Builder()
-            .url(url)
-            .build()
+                .url(url)
+                .build()
         return withContext(Dispatchers.IO) { newCall(req).await() }
     }
 

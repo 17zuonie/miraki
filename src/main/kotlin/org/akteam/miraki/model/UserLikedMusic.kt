@@ -33,6 +33,6 @@ object UserLikedMusics : Table<UserLikedMusic>("aki_liked_music") {
     val subTime = timestamp("sub_time").bindTo { it.subTime }
 
     fun liked(qq: Long, music: RecommendMusic) = BotVariables.db.sequenceOf(this)
-        .filter { (it.qq eq qq) and (it.musicId eq music.n) and (it.playlistId eq music.playlistId) }
-        .count()
+            .filter { (it.qq eq qq) and (it.musicId eq music.n) and (it.playlistId eq music.playlistId) }
+            .count()
 }

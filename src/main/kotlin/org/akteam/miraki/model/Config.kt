@@ -5,8 +5,8 @@ import java.util.UUID.randomUUID
 
 @Serializable
 data class Config(
-    val akiQQ: Long,
-    val password: String
+        val akiQQ: Long,
+        val password: String
 ) {
     val rootUser = 10000L
     val netEaseCookie = ""

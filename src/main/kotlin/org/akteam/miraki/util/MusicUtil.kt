@@ -21,28 +21,28 @@ object MusicUtil {
     suspend fun searchNetEaseMusic(songName: String, directLink: Boolean = false): Message {
         try {
             BotVariables.logger.debug(
-                "http://${BotVariables.cfg.netEaseApi}/search?keywords=${
-                    URLEncoder.encode(
-                        songName,
-                        "UTF-8"
-                    )
-                }"
+                    "http://${BotVariables.cfg.netEaseApi}/search?keywords=${
+                        URLEncoder.encode(
+                                songName,
+                                "UTF-8"
+                        )
+                    }"
             )
             val rep = client.get(
-                "http://${BotVariables.cfg.netEaseApi}/search?keywords=${
-                    URLEncoder.encode(
-                        songName,
-                        "UTF-8"
-                    )
-                }"
+                    "http://${BotVariables.cfg.netEaseApi}/search?keywords=${
+                        URLEncoder.encode(
+                                songName,
+                                "UTF-8"
+                        )
+                    }"
             )
             if (rep.isSuccessful) {
                 val searchResult = json.parseToJsonElement(rep.readText()).jsonObject
                 val musicId = searchResult["result"]!!
-                    .jsonObject["songs"]!!
-                    .jsonArray[0]
-                    .jsonObject["id"]!!
-                    .jsonPrimitive.int
+                        .jsonObject["songs"]!!
+                        .jsonArray[0]
+                        .jsonObject["id"]!!
+                        .jsonPrimitive.int
                 val musicUrl = "https://music.163.com/#/song?id=$musicId"
                 val songResult = client.get("http://${BotVariables.cfg.netEaseApi}/song/detail?ids=$musicId").readText()
 
@@ -50,16 +50,16 @@ object MusicUtil {
 
                 val songJson = json.parseToJsonElement(songResult)
                 val albumUrl = songJson
-                    .jsonObject["songs"]!!
-                    .jsonArray[0]
-                    .jsonObject["al"]!!
-                    .jsonObject["picUrl"]!!
-                    .jsonPrimitive.content
+                        .jsonObject["songs"]!!
+                        .jsonArray[0]
+                        .jsonObject["al"]!!
+                        .jsonObject["picUrl"]!!
+                        .jsonPrimitive.content
                 val name = songJson
-                    .jsonObject["songs"]!!
-                    .jsonArray[0]
-                    .jsonObject["name"]!!
-                    .jsonPrimitive.content
+                        .jsonObject["songs"]!!
+                        .jsonArray[0]
+                        .jsonObject["name"]!!
+                        .jsonPrimitive.content
                 var artistName = ""
 
                 songJson.jsonObject["songs"]!!.jsonArray[0].jsonObject["ar"]!!.jsonArray.forEach {
@@ -72,9 +72,9 @@ object MusicUtil {
                     client.get("http://${BotVariables.cfg.netEaseApi}/song/url?id=$musicId")
                 } else {
                     val req = Request.Builder()
-                        .url("http://${BotVariables.cfg.netEaseApi}/song/url?id=$musicId")
-                        .header("Cookie", BotVariables.cfg.netEaseCookie)
-                        .build()
+                            .url("http://${BotVariables.cfg.netEaseApi}/song/url?id=$musicId")
+                            .header("Cookie", BotVariables.cfg.netEaseCookie)
+                            .build()
                     BotVariables.logger.debug(req.headers.toString())
 
                     client.get(req)
@@ -83,13 +83,13 @@ object MusicUtil {
                 if (playResult.isSuccessful) {
                     val playJson = json.parseToJsonElement(playResult.readText()).jsonObject
                     val playUrl = playJson["data"]!!
-                        .jsonArray[0]
-                        .jsonObject["url"]!!
-                        .jsonPrimitive.content
+                            .jsonArray[0]
+                            .jsonObject["url"]!!
+                            .jsonPrimitive.content
 
                     return if (!directLink) {
                         LightApp(
-                            """
+                                """
                             {
                                 "app": "com.tencent.structmsg",
                                 "desc": "音乐",

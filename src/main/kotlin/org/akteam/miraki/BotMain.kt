@@ -32,27 +32,27 @@ object BotMain {
         startUpTask()
 
         MessageHandler.setupSimpleCommand(
-            arrayOf(
-                    VersionCommand(),
-                HelpCommand(),
-                MusicCommand(),
-                NoticeCommand(),
-                ManageCommand()
-            )
+                arrayOf(
+                        VersionCommand(),
+                        HelpCommand(),
+                        MusicCommand(),
+                        NoticeCommand(),
+                        ManageCommand()
+                )
         )
         BotVariables.logger.info("[命令] 已注册 ${MessageHandler.countSimpleCommands()} 个简单命令")
 
         MessageHandler.setupNaturalCommand(
-            GuessNumberCommand()
+                GuessNumberCommand()
         )
         BotVariables.logger.info("[命令] 已注册 ${MessageHandler.countNaturalCommands()} 个自然命令")
 
         MessageHandler.start(BotVariables.bot)
 
         val listeners: Array<MListener> = arrayOf(
-            FuckLightAppListener,
-            NewFriendListener,
-            MusicVoteListener
+                FuckLightAppListener,
+                NewFriendListener,
+                MusicVoteListener
         )
 
         /** 监听器 */
@@ -72,10 +72,10 @@ object BotMain {
 
     private fun startUpTask() {
         TaskManager.runScheduleTaskAsync(
-            ChunHuiNoticeUpdater::run,
-            BotVariables.cfg.fetchNoticeDelay,
-            BotVariables.cfg.fetchNoticeDelay,
-            TimeUnit.SECONDS
+                ChunHuiNoticeUpdater::run,
+                BotVariables.cfg.fetchNoticeDelay,
+                BotVariables.cfg.fetchNoticeDelay,
+                TimeUnit.SECONDS
         )
     }
 }

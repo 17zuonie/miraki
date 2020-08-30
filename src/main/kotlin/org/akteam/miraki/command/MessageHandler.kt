@@ -100,14 +100,14 @@ object MessageHandler {
                         return true
                     } else if (cmd is UserCommand && user != null) {
                         // 需要认证
-                            if (user.hasPermission(cmd.level)) {
-                                cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
-                            } else {
-                                event.reply("你没有权限!")
-                            }
+                        if (user.hasPermission(cmd.level)) {
+                            cmd.execute(event, splitMessage.subList(1, splitMessage.size), user)
+                        } else {
+                            event.reply("你没有权限!")
+                        }
                         val usedTime = Duration.between(executedTime, LocalDateTime.now())
                         BotVariables.logger.debug(
-                            "[命令] 命令执行耗时 ${usedTime.toMillis()}ms"
+                                "[命令] 命令执行耗时 ${usedTime.toMillis()}ms"
                         )
                         return true
                     }

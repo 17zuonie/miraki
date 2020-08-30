@@ -17,14 +17,14 @@ object FuckLightAppListener : MListener {
                     val prompt = jsonObject["prompt"]!!.jsonPrimitive.content
                     if (prompt.contentEquals("[QQ小程序]哔哩哔哩")) {
                         val meta = jsonObject["meta"]!!
-                            .jsonObject["detail_1"]!!
-                            .jsonObject
+                                .jsonObject["detail_1"]!!
+                                .jsonObject
                         val title = meta["desc"]!!.jsonPrimitive.content
                         val url = meta["qqdocurl"]!!.jsonPrimitive.content
                         reply(
-                            "天下无小程序 > 自动为电脑选手转换了小程序:\n" +
-                                    "视频标题: $title\n" +
-                                    "链接: ${url.substring(0, url.indexOf("?") - 1)}"
+                                "天下无小程序 > 自动为电脑选手转换了小程序:\n" +
+                                        "视频标题: $title\n" +
+                                        "链接: ${url.substring(0, url.indexOf("?") - 1)}"
                         )
                     }
                 }

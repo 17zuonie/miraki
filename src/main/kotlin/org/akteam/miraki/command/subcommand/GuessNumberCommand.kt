@@ -8,7 +8,7 @@ import org.akteam.miraki.model.BotUser
 import org.akteam.miraki.model.UserLevel
 import kotlin.random.Random
 
-class GuessNumberCommand: NaturalCommand {
+class GuessNumberCommand : NaturalCommand {
 
 
     override suspend fun entry(event: MessageEvent, user: BotUser) {

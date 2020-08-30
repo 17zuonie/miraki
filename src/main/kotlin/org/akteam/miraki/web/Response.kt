@@ -52,8 +52,8 @@ object Response {
 
     @Serializable
     data class AuthInfo(
-        val valid: Boolean,
-        val qq: Long,
-        val expireAt: Long
+            val valid: Boolean,
+            val qq: Long,
+            val expireAt: Long
     )
 }

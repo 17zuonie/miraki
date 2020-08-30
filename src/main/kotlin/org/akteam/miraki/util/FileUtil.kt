@@ -14,17 +14,17 @@ object FileUtil {
     private val client = OkHttpClient()
     suspend fun uploadToFFSup(file: File) {
         val formBody = MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart(
-                "file", file.name,
-                file.asRequestBody("application/octet-stream".toMediaType())
-            )
-            .build()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart(
+                        "file", file.name,
+                        file.asRequestBody("application/octet-stream".toMediaType())
+                )
+                .build()
 
         val request = Request.Builder()
-            .url("https://upload.ffsup.com/")
-            .post(formBody)
-            .build()
+                .url("https://upload.ffsup.com/")
+                .post(formBody)
+                .build()
 
         withContext(Dispatchers.IO) {
             client.newCall(request).execute().use {
