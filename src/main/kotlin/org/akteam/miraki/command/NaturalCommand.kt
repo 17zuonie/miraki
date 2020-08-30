@@ -12,11 +12,11 @@ import kotlin.coroutines.resume
 
 data class Intent(
 
-        // 0..100
-        val confidence: Int,
+    // 0..100
+    val confidence: Int,
 
-        // 推荐执行命令，可以不是自己
-        val advice: NaturalCommand
+    // 推荐执行命令，可以不是自己
+    val advice: NaturalCommand?
 )
 
 interface NaturalCommand {

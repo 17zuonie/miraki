@@ -130,13 +130,13 @@ object MessageHandler {
         if (user != null) {
             try {
                 val intents = naturalCommands
-                        .map { it.intent(event, user) }
-                        // 置信度大于 60 且用户拥有权限
-                        .filter { it.confidence >= 60 && user.hasPermission(it.advice.userLevel) }
+                    .map { it.intent(event, user) }
+                    // 置信度大于 60 且用户拥有权限
+                    .filter { it.advice != null && it.confidence >= 60 && user.hasPermission(it.advice.userLevel) }
 
                 val intent = intents.minByOrNull { it.confidence }
                 return if (intent != null) {
-                    intent.advice.entry(event, user)
+                    intent.advice!!.entry(event, user)
                     true
                 } else false
             } catch (t: Throwable) {
