@@ -5,6 +5,7 @@ import me.liuwj.ktorm.entity.add
 import me.liuwj.ktorm.entity.find
 import me.liuwj.ktorm.entity.sequenceOf
 import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.toMessage
 import org.akteam.miraki.BotVariables
 import org.akteam.miraki.command.CommandProps
@@ -24,45 +25,47 @@ class MusicCommand : UserCommand {
         event.reply(if (args.isNotEmpty()) {
             when (args[0]) {
                 "创建歌单" -> {
-                    if (user.hasPermission(UserLevel.ADMIN)) "没有权限".toMessage()
+                    if (user.hasPermission(UserLevel.ADMIN)) PlainText("没有权限")
                     try {
                         val pl = Playlist {
                             startTime = Instant.now()
                             endTime = null
                         }
                         BotVariables.db.sequenceOf(Playlists).add(pl)
-                        "成功，歌单 ID 为 ${pl.n}".toMessage()
+                        PlainText("成功，歌单 ID 为 ${pl.n}")
                     } catch (e: Exception) {
-                        "出现错误 ${e.message}".toMessage()
+                        PlainText("出现错误 ${e.message}")
                     }
                 }
                 "终止歌单" -> {
-                    if (user.hasPermission(UserLevel.ADMIN)) "没有权限".toMessage()
+                    if (user.hasPermission(UserLevel.ADMIN)) PlainText("没有权限")
                     try {
                         val pl = BotVariables.db.sequenceOf(Playlists).find { it.n eq args[1].toInt() }
-                        if (pl == null) "失败，歌单不存在".toMessage()
+                        if (pl == null) PlainText("失败，歌单不存在")
                         else {
                             pl.endTime = Instant.now()
                             pl.flushChanges()
-                            "成功，歌单 ${pl.n} 已终止".toMessage()
+                            PlainText("成功，歌单 ${pl.n} 已终止")
                         }
                     } catch (e: Exception) {
-                        "出现错误 ${e.message}".toMessage()
+                        PlainText("出现错误 ${e.message}")
                     }
                 }
                 "投票" -> {
-                    BotUtils.makeLinkCard(
+                    // 群成员非好友时会发送临时会话
+                    event.sender.sendMessage(BotUtils.makeLinkCard(
                             "专属午休歌投票通道",
                             "有效期十五分钟，请不要泄漏给别人哦",
                             "${BotVariables.cfg.httpApiUrl}#/auth/${JwtConfig.makeToken(user)}",
                             "[链接]午休歌投票"
-                    )
+                    ))
+                    PlainText("链接私戳你了，注意查收哦")
                 }
                 "下载" -> MusicUtil.searchNetEaseMusic(args.getRestString(1), directLink = true)
                 else -> MusicUtil.searchNetEaseMusic(args.getRestString(1))
             }
         } else {
-            help.toMessage()
+            PlainText(help)
         })
     }
 
