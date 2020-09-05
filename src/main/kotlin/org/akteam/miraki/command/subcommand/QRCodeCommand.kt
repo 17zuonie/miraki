@@ -5,7 +5,7 @@ import com.google.zxing.LuminanceSource
 import com.google.zxing.NotFoundException
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource
 import com.google.zxing.common.HybridBinarizer
-import com.google.zxing.qrcode.decoder.Decoder
+import com.google.zxing.qrcode.QRCodeReader
 import com.google.zxing.qrcode.detector.Detector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,17 +27,19 @@ class QRCodeCommand : NaturalCommand {
     private val client = OkHttpClient()
 
     override suspend fun entry(event: MessageEvent, user: BotUser) {
-        val img = event.message[Image]!!
-        val imgUrl = img.queryUrl()
-        val rep = client.get(imgUrl)
-        if (rep.isSuccessful && rep.body != null) {
-            val bitmap = withContext(Dispatchers.IO) {
-                val image: BufferedImage = ImageIO.read(rep.body!!.byteStream())
-                val source: LuminanceSource = BufferedImageLuminanceSource(image)
-                BinaryBitmap(HybridBinarizer(source))
+        val img = event.message[Image]
+        if (img != null) {
+            val imgUrl = img.queryUrl()
+            val rep = client.get(imgUrl)
+            if (rep.isSuccessful && rep.body != null) {
+                val bitmap = withContext(Dispatchers.IO) {
+                    val image: BufferedImage = ImageIO.read(rep.body!!.byteStream())
+                    val source: LuminanceSource = BufferedImageLuminanceSource(image)
+                    BinaryBitmap(HybridBinarizer(source))
+                }
+                val result = QRCodeReader().decode(bitmap)
+                event.reply(PlainText(result.text))
             }
-            val result = Decoder().decode(bitmap.blackMatrix)
-            event.reply(PlainText(result.text))
         }
     }
 
