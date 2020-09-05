@@ -118,7 +118,8 @@ object MessageHandler {
             if (msg != null && msg.contains("time")) {
                 event.reply("Bot > 在执行网络操作时连接超时".toMsgChain())
             } else {
-                BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId", t)
+                t.printStackTrace()
+                BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: $message, 发送者: $senderId")
                 event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
             }
         }
@@ -136,6 +137,7 @@ object MessageHandler {
 
                 val intent = intents.minByOrNull { it.confidence }
                 return if (intent != null) {
+                    BotVariables.logger.info("选择执行 Intent: ${intent.advice} 执行度: ${intent.confidence}")
                     intent.advice!!.entry(event, user)
                     true
                 } else false
@@ -145,10 +147,8 @@ object MessageHandler {
                         event.reply("这么久不理我，我去休息了")
                     }
                     else -> {
-                        BotVariables.logger.warning(
-                            "[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}",
-                            t
-                        )
+                        t.printStackTrace()
+                        BotVariables.logger.warning("[命令] 在试图执行命令时发生了一个错误, 原文: ${event.message.contentToString()}, 发送者: ${event.sender.id}")
                         event.reply("Bot > 在试图执行命令时发生了一个错误, 请联系管理员".toMsgChain())
                     }
                 }
