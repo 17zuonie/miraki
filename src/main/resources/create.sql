@@ -31,5 +31,6 @@ CREATE TABLE aki_liked_music (
 CREATE TABLE aki_user (
     qq BIGINT PRIMARY KEY,
     level VARCHAR ( 10 ) NOT NULL,
-    sub_chnotice BOOLEAN NOT NULL DEFAULT FALSE
+    sub_chnotice BOOLEAN NOT NULL DEFAULT FALSE,
+    gra_year INT
 );

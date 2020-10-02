@@ -7,7 +7,9 @@ import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.event.subscribe
 import net.mamoe.mirai.event.subscribeAlways
 import org.akteam.miraki.BotVariables
+import org.akteam.miraki.model.BotUser
 import org.akteam.miraki.model.BotUsers
+import org.akteam.miraki.model.UserLevel
 import org.akteam.miraki.util.BotUtils
 
 object NewFriendListener : MListener {
@@ -22,7 +24,12 @@ object NewFriendListener : MListener {
                     BotVariables.logger.debug("[用户] 成功读取年级: 高${grade}|${year}届")
                     bot.subscribe<FriendAddEvent> {
                         if (this.friend.id == this@subscribeAlways.fromId) {
-                            BotUsers.add(friend)
+                            BotUsers.add(BotUser {
+                                qq = friend.id
+                                level = UserLevel.NORMAL
+                                subChunHuiNotice = false
+                                graduateYear = year
+                            })
                             bot.getFriend(BotVariables.cfg.rootUser).sendMessage("新朋友 :: ${year % 100}届\n${friend.nick}(${friend.id})")
                             BotVariables.logger.info("[用户] 欢迎 ${friend.nick} (${friend.id}) 加入 Aki")
                             return@subscribe ListeningStatus.STOPPED

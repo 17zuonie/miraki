@@ -9,7 +9,7 @@ import org.akteam.miraki.model.BotUsers
 object FriendDeleteListener : MListener {
     override fun register(bot: Bot) {
         bot.subscribeAlways<FriendDeleteEvent> {
-            BotUsers.delete(friend)
+            BotUsers.delete(friend.id)
             BotVariables.logger.info("[用户] ${friend.nick}(${friend.id}) 已不再是好友")
         }
     }

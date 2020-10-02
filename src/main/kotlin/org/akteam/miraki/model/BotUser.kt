@@ -2,11 +2,7 @@ package org.akteam.miraki.model
 
 import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.entity.*
-import me.liuwj.ktorm.schema.Table
-import me.liuwj.ktorm.schema.boolean
-import me.liuwj.ktorm.schema.enum
-import me.liuwj.ktorm.schema.long
-import net.mamoe.mirai.contact.Friend
+import me.liuwj.ktorm.schema.*
 import org.akteam.miraki.BotVariables
 
 enum class UserLevel {
@@ -19,6 +15,7 @@ interface BotUser : Entity<BotUser> {
     var qq: Long
     var level: UserLevel
     var subChunHuiNotice: Boolean
+    var graduateYear: Int?
 
     fun hasPermission(minimalUserLevel: UserLevel): Boolean {
         return this.qq == BotVariables.cfg.rootUser || this.level >= minimalUserLevel
@@ -29,16 +26,14 @@ object BotUsers : Table<BotUser>("aki_user") {
     val qq = long("qq").primaryKey().bindTo { it.qq }
     val level = enum<UserLevel>("level").bindTo { it.level }
     val subChunHuiNotice = boolean("sub_chnotice").bindTo { it.subChunHuiNotice }
+    val graduateYear = int("gra_year").bindTo { it.graduateYear }
 
-    fun add(friend: Friend, users: EntitySequence<BotUser, BotUsers> = BotVariables.db.sequenceOf(BotUsers)) {
-        users.add(BotUser {
-            qq = friend.id
-            level = UserLevel.NORMAL
-        })
+    fun add(user: BotUser, users: EntitySequence<BotUser, BotUsers> = BotVariables.db.sequenceOf(BotUsers)) {
+        users.add(user)
     }
 
-    fun delete(friend: Friend, users: EntitySequence<BotUser, BotUsers> = BotVariables.db.sequenceOf(BotUsers)) {
-        users.removeIf { qq eq friend.id }
+    fun delete(id: Long, users: EntitySequence<BotUser, BotUsers> = BotVariables.db.sequenceOf(BotUsers)) {
+        users.removeIf { qq eq id }
     }
 
     fun loadUsers() {
@@ -51,7 +46,11 @@ object BotUsers : Table<BotUser>("aki_user") {
         }
         friends.forEach {
             val dbUser = map[it.id]
-            if (dbUser == null) add(it, users)
+            if (dbUser == null) add(BotUser {
+                qq = it.id
+                level = UserLevel.NORMAL
+                subChunHuiNotice = false
+            }, users)
         }
     }
 
