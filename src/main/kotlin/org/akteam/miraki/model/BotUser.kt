@@ -2,7 +2,10 @@ package org.akteam.miraki.model
 
 import me.liuwj.ktorm.dsl.eq
 import me.liuwj.ktorm.entity.*
-import me.liuwj.ktorm.schema.*
+import me.liuwj.ktorm.schema.Table
+import me.liuwj.ktorm.schema.boolean
+import me.liuwj.ktorm.schema.enum
+import me.liuwj.ktorm.schema.long
 import net.mamoe.mirai.contact.Friend
 import org.akteam.miraki.BotVariables
 
@@ -24,7 +27,7 @@ interface BotUser : Entity<BotUser> {
 
 object BotUsers : Table<BotUser>("aki_user") {
     val qq = long("qq").primaryKey().bindTo { it.qq }
-    val level = enum("level", typeRef<UserLevel>()).bindTo { it.level }
+    val level = enum<UserLevel>("level").bindTo { it.level }
     val subChunHuiNotice = boolean("sub_chnotice").bindTo { it.subChunHuiNotice }
 
     fun add(friend: Friend, users: EntitySequence<BotUser, BotUsers> = BotVariables.db.sequenceOf(BotUsers)) {
@@ -32,6 +35,10 @@ object BotUsers : Table<BotUser>("aki_user") {
             qq = friend.id
             level = UserLevel.NORMAL
         })
+    }
+
+    fun delete(friend: Friend, users: EntitySequence<BotUser, BotUsers> = BotVariables.db.sequenceOf(BotUsers)) {
+        users.removeIf { qq eq friend.id }
     }
 
     fun loadUsers() {

@@ -13,6 +13,7 @@ import org.akteam.miraki.BotVariables
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.coroutines.resumeWithException
 
 fun String.toMsgChain(): MessageChain {
@@ -45,7 +46,7 @@ object BotUtils {
         preview: String = BotVariables.bot.selfQQ.avatarUrl,
         tag: String = "Aki"
     ) = LightApp(
-        """
+            """
             {
                 "app": "com.tencent.structmsg",
                 "desc": "新闻",
@@ -70,6 +71,37 @@ object BotUtils {
             }
         """.trimIndent()
     )
+
+    fun stripGrade(raw: String): Int {
+        return when {
+            raw.contains("高一") -> 1
+            raw.contains("高二") -> 2
+            raw.contains("高三") -> 3
+            else -> throw IllegalArgumentException("不存在指定的年级")
+        }
+    }
+
+    fun gradeToYear(grade: Int): Int {
+        val now = Calendar.getInstance()
+        val month = now.get(Calendar.MONTH)
+        val year = now.get(Calendar.YEAR)
+        return if (month >= 9) { // 九月之后，新学期
+            when (grade) {
+                1 -> year + 3
+                2 -> year + 2
+                3 -> year + 1
+                else -> throw IllegalArgumentException("`$grade' 不存在")
+            }
+        } else {
+            when (grade) {
+                1 -> year + 2
+                2 -> year + 1
+                3 -> year
+                else -> throw IllegalArgumentException("`$grade' 不存在")
+            }
+        }
+
+    }
 
     @ExperimentalCoroutinesApi
     suspend fun Call.await(recordStack: Boolean = false): Response {

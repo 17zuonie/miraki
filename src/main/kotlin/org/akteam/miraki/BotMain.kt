@@ -7,10 +7,7 @@ import net.mamoe.mirai.join
 import net.mamoe.mirai.utils.BotConfiguration
 import org.akteam.miraki.command.MessageHandler
 import org.akteam.miraki.command.subcommand.*
-import org.akteam.miraki.listener.FuckLightAppListener
-import org.akteam.miraki.listener.MListener
-import org.akteam.miraki.listener.MusicVoteListener
-import org.akteam.miraki.listener.NewFriendListener
+import org.akteam.miraki.listener.*
 import org.akteam.miraki.manager.TaskManager
 import org.akteam.miraki.model.BotUsers
 import org.akteam.miraki.tasks.ChunHuiNoticeUpdater
@@ -32,30 +29,31 @@ object BotMain {
         startUpTask()
 
         MessageHandler.setupSimpleCommand(
-            arrayOf(
-                VersionCommand(),
-                HelpCommand(),
-                MusicCommand(),
-                NoticeCommand(),
-                ManageCommand()
-            )
+                arrayOf(
+                        VersionCommand(),
+                        HelpCommand(),
+                        MusicCommand(),
+                        NoticeCommand(),
+                        ManageCommand()
+                )
         )
         BotVariables.logger.info("[命令] 已注册 ${MessageHandler.countSimpleCommands()} 个简单命令")
 
         MessageHandler.setupNaturalCommand(
-            arrayOf(
-                GuessNumberCommand(),
-                QRCodeCommand()
-            )
+                arrayOf(
+                        GuessNumberCommand(),
+                        QRCodeCommand()
+                )
         )
         BotVariables.logger.info("[命令] 已注册 ${MessageHandler.countNaturalCommands()} 个自然命令")
 
         MessageHandler.start(BotVariables.bot)
 
         val listeners: Array<MListener> = arrayOf(
-            FuckLightAppListener,
-            NewFriendListener,
-            MusicVoteListener
+                FuckLightAppListener,
+                NewFriendListener,
+                FriendDeleteListener,
+                MusicVoteListener
         )
 
         /** 监听器 */
@@ -75,10 +73,10 @@ object BotMain {
 
     private fun startUpTask() {
         TaskManager.runScheduleTaskAsync(
-            ChunHuiNoticeUpdater::run,
-            BotVariables.cfg.fetchNoticeDelay,
-            BotVariables.cfg.fetchNoticeDelay,
-            TimeUnit.SECONDS
+                ChunHuiNoticeUpdater::run,
+                BotVariables.cfg.fetchNoticeDelay,
+                BotVariables.cfg.fetchNoticeDelay,
+                TimeUnit.SECONDS
         )
     }
 }

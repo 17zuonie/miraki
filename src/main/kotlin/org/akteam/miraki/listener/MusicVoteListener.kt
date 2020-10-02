@@ -36,7 +36,7 @@ object MusicVoteListener : MListener {
                                     (Playlists.endTime.isNull() or (Playlists.endTime greater now))
                         }.firstOrNull()
                         if (playlist == null) {
-                            reply("投稿已结束或者未开始，看准时间再来")
+                            reply("投稿已结束或者未开始，看准时间再来吧")
                             return@always
                         }
                         val new = RecommendMusic {
