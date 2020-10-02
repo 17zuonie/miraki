@@ -49,6 +49,14 @@ object SessionManager {
         return true
     }
 
+    fun match(senderId: Long, groupId: Long? = null): Session? {
+        return if (groupId == null) {
+            sessions[senderId]
+        } else {
+            groupSessions[Pair(groupId, senderId)]
+        }
+    }
+
     fun set(event: MessageEvent, expireTime: Instant, handler: (MessageEvent) -> Unit) {
         val senderId = event.sender.id
         when (event) {

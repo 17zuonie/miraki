@@ -14,5 +14,5 @@ object FriendDeleteListener : MListener {
         }
     }
 
-    override val name: String = "删除好友监听器"
+    override val name: String = "好友删除"
 }

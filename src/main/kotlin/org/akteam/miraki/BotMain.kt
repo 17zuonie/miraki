@@ -53,6 +53,7 @@ object BotMain {
                 FuckLightAppListener,
                 NewFriendListener,
                 FriendDeleteListener,
+                InputStatusListener,
                 MusicVoteListener
         )
 
