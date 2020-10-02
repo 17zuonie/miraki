@@ -54,7 +54,7 @@ object BotMain {
                 NewFriendListener,
                 FriendDeleteListener,
                 InputStatusListener,
-                MusicVoteListener
+//                MusicVoteListener
         )
 
         /** 监听器 */
