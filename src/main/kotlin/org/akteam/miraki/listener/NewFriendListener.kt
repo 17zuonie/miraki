@@ -11,6 +11,7 @@ import org.akteam.miraki.model.BotUser
 import org.akteam.miraki.model.BotUsers
 import org.akteam.miraki.model.UserLevel
 import org.akteam.miraki.util.BotUtils
+import java.time.Instant
 
 object NewFriendListener : MListener {
     private val answerPattern = Regex("^回答:(.*)\$", RegexOption.MULTILINE)
@@ -30,7 +31,7 @@ object NewFriendListener : MListener {
                                 subChunHuiNotice = false
                                 graduateYear = year
                             })
-                            bot.getFriend(BotVariables.cfg.rootUser).sendMessage("新朋友 :: ${year % 100}届\n${friend.nick}(${friend.id})")
+                            bot.getFriend(BotVariables.cfg.rootUser).sendMessage("${Instant.now()}\n新朋友 :: ${friend.nick}(${friend.id})\n请手动添加备注 ${year % 100}届\n")
                             BotVariables.logger.info("[用户] 欢迎 ${friend.nick} (${friend.id}) 加入 Aki")
                             return@subscribe ListeningStatus.STOPPED
                         }
