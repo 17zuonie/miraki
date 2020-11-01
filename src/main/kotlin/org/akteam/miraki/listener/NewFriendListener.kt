@@ -6,6 +6,8 @@ import net.mamoe.mirai.event.events.FriendAddEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.event.subscribe
 import net.mamoe.mirai.event.subscribeAlways
+import net.mamoe.mirai.message.data.Face
+import net.mamoe.mirai.message.data.PlainText
 import org.akteam.miraki.BotVariables
 import org.akteam.miraki.model.BotUser
 import org.akteam.miraki.model.BotUsers
@@ -32,7 +34,8 @@ object NewFriendListener : MListener {
                                 graduateYear = year
                             })
                             bot.getGroup(BotVariables.cfg.newFriendGroup)
-                                    .sendMessage("${Instant.now()}\n新朋友 :: ${friend.nick}(${friend.id})\n请手动添加备注 ${year % 100}届\n")
+                                .sendMessage("${Instant.now()}\n新朋友 :: ${friend.nick}(${friend.id})\n请手动添加备注 ${year % 100}届")
+                            friend.sendMessage(PlainText("欢迎你，`${friend.nick}`\n你的好友请求已经被智能机器人 Aki 处理了哦") + Face(74))
                             BotVariables.logger.info("[用户] 欢迎 ${friend.nick} (${friend.id}) 加入 Aki")
                             return@subscribe ListeningStatus.STOPPED
                         }
