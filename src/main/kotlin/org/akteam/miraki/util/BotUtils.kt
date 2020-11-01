@@ -74,9 +74,9 @@ object BotUtils {
 
     fun stripGrade(raw: String): Int {
         return when {
-            raw.contains("高一") -> 1
-            raw.contains("高二") -> 2
-            raw.contains("高三") -> 3
+            raw.contains("高一") || raw.contains("高1") || raw.contains("一年级") -> 1
+            raw.contains("高二") || raw.contains("高2") || raw.contains("二年级") -> 2
+            raw.contains("高三") || raw.contains("高3") || raw.contains("三年级") -> 3
             else -> throw IllegalArgumentException("不存在指定的年级")
         }
     }
