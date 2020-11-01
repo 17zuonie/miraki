@@ -9,6 +9,7 @@ data class Config(
     val password: String
 ) {
     val rootUser = 10000L
+    val newFriendGroup = 10000L
     val netEaseCookie = ""
     val netEaseApi = "localhost:3000"
     val databaseUrl = "jdbc:pgsql://localhost/miraki"

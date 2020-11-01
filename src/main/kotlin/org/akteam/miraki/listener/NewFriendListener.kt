@@ -31,7 +31,8 @@ object NewFriendListener : MListener {
                                 subChunHuiNotice = false
                                 graduateYear = year
                             })
-                            bot.getFriend(BotVariables.cfg.rootUser).sendMessage("${Instant.now()}\n新朋友 :: ${friend.nick}(${friend.id})\n请手动添加备注 ${year % 100}届\n")
+                            bot.getGroup(BotVariables.cfg.newFriendGroup)
+                                    .sendMessage("${Instant.now()}\n新朋友 :: ${friend.nick}(${friend.id})\n请手动添加备注 ${year % 100}届\n")
                             BotVariables.logger.info("[用户] 欢迎 ${friend.nick} (${friend.id}) 加入 Aki")
                             return@subscribe ListeningStatus.STOPPED
                         }
