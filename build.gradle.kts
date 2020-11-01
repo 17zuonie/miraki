@@ -10,7 +10,8 @@ version = "4.0-SNAPSHOT"
 
 repositories {
 //    mavenLocal()
-    maven(url = "https://maven.aliyun.com/repository/public")
+    maven(url = "https://oss.heavenark.com/repository/MavenPublic/")
+    maven(url = "https://maven.aliyun.com/repository/public/")
     maven(url = "https://dl.bintray.com/kotlin/kotlin-eap")
     maven(url = "https://kotlin.bintray.com/kotlinx")
     mavenCentral()
@@ -21,20 +22,13 @@ tasks.withType<KotlinCompile> {
 }
 
 object Versions {
-    const val mirai = "1.3.1"
+    const val mirai = "1.3.3"
 
     object Kotlin {
         const val compiler = "1.4.10"
         const val stdlib = "1.4.10"
-        const val coroutines = "1.3.9"
-        const val atomicFU = "0.14.4"
         const val serialization = "1.0.0-RC"
-        const val ktor = "1.4.0"
-        const val binaryValidator = "0.2.3"
-
-        const val io = "0.1.16"
-        const val coroutinesIo = "0.1.16"
-        const val dokka = "0.10.1"
+        const val ktor = "1.4.1"
     }
 }
 
