@@ -1,5 +1,6 @@
 package org.akteam.miraki.listener
 
+import kotlinx.coroutines.delay
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.events.FriendInputStatusChangedEvent
 import net.mamoe.mirai.event.subscribeAlways
@@ -23,12 +24,12 @@ object InputStatusListener : MListener {
     override fun register(bot: Bot) {
         bot.subscribeAlways<FriendInputStatusChangedEvent> {
             val last = hit.getOrDefault(friend.id, Instant.MIN)
-            if (!inputting || SessionManager.match(friend.id) != null || last >= Instant.now()
-                    .minusSeconds(300)
-            ) return@subscribeAlways
+            if (!inputting || SessionManager.match(friend.id) != null || last.plusSeconds(600) >= Instant.now())
+                return@subscribeAlways
 
             // 1/3 的概率触发
             if (Random.nextInt(3) == 0) {
+                delay(1000)
                 friend.sendMessage(tips.random())
                 hit[friend.id] = Instant.now()
             }
