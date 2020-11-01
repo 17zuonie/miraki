@@ -86,7 +86,7 @@ fun main(args: Array<String>) = runBlocking<Unit> {
     BotVariables.init()
     BotVariables.load()
 
-    if (BotVariables.cfg.akiQQ == 0L || BotVariables.cfg.password == "") {
+    if (BotVariables.cfg.akiQQ == 10000L || BotVariables.cfg.password == "") {
         println("请到 config.json 里填写机器人的QQ号&密码")
         exitProcess(0)
     }
@@ -95,5 +95,5 @@ fun main(args: Array<String>) = runBlocking<Unit> {
     WebMain.run(args, wait = false)
 
     BotVariables.bot.join() // 等待 Bot 离线, 避免主线程退出
-    TODO("Retry login.")
+    println("再见.")
 }
