@@ -46,7 +46,7 @@ object BotUtils {
         preview: String = BotVariables.bot.selfQQ.avatarUrl,
         tag: String = "Aki"
     ) = LightApp(
-            """
+        """
             {
                 "app": "com.tencent.structmsg",
                 "desc": "新闻",
