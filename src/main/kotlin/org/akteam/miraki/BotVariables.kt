@@ -29,6 +29,7 @@ object BotVariables {
 
     val json = Json {
         prettyPrint = true
+        encodeDefaults = true
     }
 
     val http = OkHttpClient().newBuilder()
