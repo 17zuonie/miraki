@@ -39,14 +39,14 @@ object BotUtils {
     }
 
     fun makeLinkCard(
-        title: String,
-        desc: String,
-        jumpUrl: String,
-        prompt: String = "[分享]一条链接",
-        preview: String = BotVariables.bot.selfQQ.avatarUrl,
-        tag: String = "Aki"
+            title: String,
+            desc: String,
+            jumpUrl: String,
+            prompt: String = "[分享]一条链接",
+            preview: String = BotVariables.bot.selfQQ.avatarUrl,
+            tag: String = "Aki"
     ) = LightApp(
-        """
+            """
             {
                 "app": "com.tencent.structmsg",
                 "desc": "新闻",
@@ -72,13 +72,19 @@ object BotUtils {
         """.trimIndent()
     )
 
-    fun stripGrade(raw: String): Int {
+    fun stripGrade(raw: String): Int? {
         return when {
             raw.contains("高一") || raw.contains("高1") || raw.contains("一年级") -> 1
             raw.contains("高二") || raw.contains("高2") || raw.contains("二年级") -> 2
             raw.contains("高三") || raw.contains("高3") || raw.contains("三年级") -> 3
-            else -> throw IllegalArgumentException("不存在指定的年级")
+            else -> null
         }
+    }
+
+    fun stripYear(raw: String): Int? {
+        val rYear = Regex("(\\d{2})届")
+        val result = rYear.find(raw)
+        return result?.groupValues?.first()?.toInt()
     }
 
     fun gradeToYear(grade: Int): Int {
@@ -100,7 +106,27 @@ object BotUtils {
                 else -> throw IllegalArgumentException("`$grade' 不存在")
             }
         }
+    }
 
+    fun yearToGrade(year: Int): Int {
+        val now = Calendar.getInstance()
+        val month = now.get(Calendar.MONTH)
+        val thisYear = now.get(Calendar.YEAR)
+        return if (month >= 9) { // 九月之后，新学期
+            when (year) {
+                thisYear + 3 -> 1
+                thisYear + 2 -> 2
+                thisYear + 1 -> 3
+                else -> 4 // 已毕业
+            }
+        } else {
+            when (year) {
+                thisYear + 2 -> 1
+                thisYear + 1 -> 2
+                thisYear -> 3
+                else -> 4 // 已毕业
+            }
+        }
     }
 
     @ExperimentalCoroutinesApi
@@ -142,8 +168,8 @@ object BotUtils {
 
     suspend fun OkHttpClient.get(url: String): Response {
         val req = Request.Builder()
-            .url(url)
-            .build()
+                .url(url)
+                .build()
         return withContext(Dispatchers.IO) { newCall(req).await() }
     }
 

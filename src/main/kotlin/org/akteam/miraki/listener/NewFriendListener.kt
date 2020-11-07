@@ -23,7 +23,10 @@ object NewFriendListener : MListener {
             if (result != null) {
                 try {
                     val grade = BotUtils.stripGrade(result.value)
-                    val year = BotUtils.gradeToYear(grade)
+                    val year = (if (grade != null) {
+                        BotUtils.gradeToYear(grade)
+                    } else BotUtils.stripYear(result.value))
+                            ?: throw IllegalArgumentException("无法读取年级/届")
                     BotVariables.logger.debug("[用户] 成功读取年级: 高${grade}|${year}届")
                     bot.subscribe<FriendAddEvent> {
                         if (this.friend.id == this@subscribeAlways.fromId) {
@@ -34,8 +37,8 @@ object NewFriendListener : MListener {
                                 graduateYear = year
                             })
                             bot.getGroup(BotVariables.cfg.newFriendGroup)
-                                .sendMessage("${Instant.now()}\n新朋友 :: ${friend.nick}(${friend.id})\n请手动添加备注 ${year % 100}届")
-                            friend.sendMessage(PlainText("欢迎你，`${friend.nick}`\n你的好友请求已经被智能机器人 Aki 处理了哦") + Face(74))
+                                    .sendMessage("${Instant.now()}\n新朋友 :: ${friend.nick}(${friend.id})\n请手动添加备注 ${year % 100}届")
+                            friend.sendMessage(PlainText("欢迎你，来自 $year 届的 `${friend.nick}`\n你的好友请求已经被智能机器人 Aki 处理了哦") + Face(74))
                             BotVariables.logger.info("[用户] 欢迎 ${friend.nick} (${friend.id}) 加入 Aki")
                             return@subscribe ListeningStatus.STOPPED
                         }
