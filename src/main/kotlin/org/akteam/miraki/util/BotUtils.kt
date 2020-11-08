@@ -72,19 +72,19 @@ object BotUtils {
         """.trimIndent()
     )
 
-    fun stripGrade(raw: String): Int? {
+    fun stripGrade(raw: String): Int {
         return when {
             raw.contains("高一") || raw.contains("高1") || raw.contains("一年级") -> 1
             raw.contains("高二") || raw.contains("高2") || raw.contains("二年级") -> 2
             raw.contains("高三") || raw.contains("高3") || raw.contains("三年级") -> 3
-            else -> null
+            else -> throw NumberFormatException("没有描述年级")
         }
     }
 
-    fun stripYear(raw: String): Int? {
+    fun stripYear(raw: String): Int {
         val rYear = Regex("(\\d{2})届")
-        val result = rYear.find(raw)
-        return result?.groupValues?.first()?.toInt()
+        val result = rYear.find(raw) ?: throw NumberFormatException("没有描述届")
+        return result.groupValues[2].toInt() + 2000
     }
 
     fun gradeToYear(grade: Int): Int {

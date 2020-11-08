@@ -6,7 +6,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 group = "org.akteam"
-version = "4.0-SNAPSHOT"
+version = "4.2-SNAPSHOT"
 
 repositories {
 //    mavenLocal()
